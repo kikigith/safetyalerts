@@ -7,10 +7,8 @@ import com.safetynet.model.Person;
 import java.util.List;
 
 public interface PersonRepository {
-    public List<Person> findAll() throws Exception;
-    public Person savePerson(Person person) throws Exception;
-    public void deletePerson(Person person)
-            throws Exception;
-    public Person findPersonByLastNameAndFirstName(String lastname, String firstname) throws JsonMappingException, Exception;
-
+    List<Person> findAll();
+    Person save(Person person);
+    void delete(Person person);
+    Person findByLastNameAndFirstName(String lastname, String firstname);
 }

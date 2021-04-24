@@ -2,9 +2,7 @@ package com.safetynet.model;
 
 public class Person {
     private String lastName;
-
     private String firstName;
-
     private String address;
     private String city;
     private String zip;
@@ -19,11 +17,6 @@ public class Person {
         this.setZip(zip);
         this.setPhone(phone);
         this.setEmail(email);
-    }
-
-    public Person(String fname, String lname) {
-        this.setFirstName(fname);
-        this.setLastName(lname);
     }
 
     public Person() {

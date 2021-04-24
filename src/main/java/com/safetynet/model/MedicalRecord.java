@@ -17,11 +17,8 @@ public class MedicalRecord {
 
     private List<String> allergies;
 
-    public MedicalRecord() {
 
-    }
-
-    public MedicalRecord(String firstName, String lastName, Date birthdate, List<String> medications,
+    public MedicalRecord(String lastName, String firstName, Date birthdate, List<String> medications,
                          List<String> allergies) {
         super();
         this.firstName = firstName;

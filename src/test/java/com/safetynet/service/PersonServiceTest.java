@@ -107,9 +107,9 @@ public class PersonServiceTest {
      */
     @Test
     public void given_a_valid_person_should_save_the_person() throws Exception, PersonInvalidException {
-        when(personRepository.savePerson(any(Person.class))).thenReturn(person);
-        Person savedPerson = personService.savePerson(person);
-        verify(personRepository).savePerson(any(Person.class));
+        when(personRepository.save(any(Person.class))).thenReturn(person);
+        Person savedPerson = personService.save(person);
+        verify(personRepository).save(any(Person.class));
         assertThat(savedPerson).isNotNull();
 
     }
@@ -119,15 +119,23 @@ public class PersonServiceTest {
      * @throws Exception
      */
     @Test
-    public void given_a_invalid_person_should_raise_exception() throws Exception {
+    public void given_invalid_lastname_save_should_raise_exception() throws Exception {
         Assertions.assertThrows(PersonInvalidException.class, () -> {
-            personService.savePerson(invalidLastnamePerson);
+            personService.save(invalidLastnamePerson);
         });
+    }
+
+    @Test
+    public void give_invalid_firstname_save_should_raise_exception() throws Exception {
         Assertions.assertThrows(PersonInvalidException.class, () -> {
-            personService.savePerson(invalidFirstnamePerson);
+            personService.save(invalidFirstnamePerson);
         });
+    }
+
+    @Test
+    public void give_invalid_lastname_save_should_raise_exception() throws Exception {
         Assertions.assertThrows(PersonInvalidException.class, () -> {
-            personService.savePerson(invalidFirstnamePerson);
+            personService.save(invalidLastnamePerson);
         });
     }
 
@@ -145,18 +153,18 @@ public class PersonServiceTest {
 
     @Test
     public void given_lastname_and_firstname_person_should_be_deleted() throws Exception, PersonNotFoundException {
-        when(personRepository.findPersonByLastNameAndFirstName(any(),any())).thenReturn(person);
-        personService.deletePerson(person.getLastName(), person.getLastName());
-        verify(personRepository, times(1)).deletePerson(any());
+        when(personRepository.findByLastNameAndFirstName(any(),any())).thenReturn(person);
+        personService.delete(person.getLastName(), person.getLastName());
+        verify(personRepository, times(1)).delete(any());
     }
 
-    @Test
+   /* @Test
     public void given_non_existing_person_delete_should_raise_PersonNotFoundException() throws Exception{
-        when(personRepository.findPersonByLastNameAndFirstName("Mike", "Cool")).thenReturn(null);
+        when(personRepository.findByLastNameAndFirstName("Mike", "Cool")).thenReturn(null);
         Assertions.assertThrows(PersonNotFoundException.class, () -> {
-            personService.deletePerson("Mike", "Cool");
+            personService.delete("Mike", "Cool");
         });
-    }
+    }*/
 
     /**
      * given_lastname_and_firstname_should_return_person - Test findPersonByLastnameAndFirstname :cas nominal
@@ -164,22 +172,30 @@ public class PersonServiceTest {
      */
     @Test
     public void given_lastname_and_firstname_should_return_person() throws Exception, PersonInvalidException, PersonNotFoundException {
-        when(personRepository.findPersonByLastNameAndFirstName("fiver", "mike")).thenReturn(person);
-        Person foundPerson = personService.findPersonByLastNameAndFirstName("fiver","mike");
+        when(personRepository.findByLastNameAndFirstName("fiver", "mike")).thenReturn(person);
+        Person foundPerson = personService.findByLastNameAndFirstName("fiver","mike");
         assertThat(foundPerson.getLastName()).isSameAs(person.getLastName());
     }
 
     /**
-     * given_lastname_and_firstname_should_return_person - Test findPersonByLastnameAndFirstname :cas exception PersonInvalidException
+     * given_invalid_lastname_findbylastnameandfirstname_should_raise_PersonNotFoundException - Test findPersonByLastnameAndFirstname :cas exception PersonInvalidException
      * @throws Exception
      */
     @Test
-    public void given_invalid_name_should_raise_PersonInvalidException() throws Exception{
-        Assertions.assertThrows(PersonInvalidException.class, () -> {
-            personService.findPersonByLastNameAndFirstName("Mike", "");
+    public void given_invalid_lastname_findbylastnameandfirstname_should_raise_PersonNotFoundException() throws Exception{
+        Assertions.assertThrows(PersonNotFoundException.class, () -> {
+            personService.findByLastNameAndFirstName("", "Cool");
         });
-        Assertions.assertThrows(PersonInvalidException.class, () -> {
-            personService.findPersonByLastNameAndFirstName("", "Cool");
+    }
+
+    /**
+     * given_invalid_firstname_findbylastnameandfirstname_should_raise_PersonInvalidException - Test findPersonByLastnameAndFirstname :cas exception PersonInvalidException
+     * @throws Exception
+     */
+    @Test
+    public void given_invalid_firstname_findbylastnameandfirstname_should_raise_PersonNotFoundException() throws Exception{
+        Assertions.assertThrows(PersonNotFoundException.class, () -> {
+            personService.findByLastNameAndFirstName("Mike", "");
         });
     }
 
@@ -189,9 +205,9 @@ public class PersonServiceTest {
      */
     @Test
     public void given_invalid_name_should_raise_PersonNotFoundException() throws Exception{
-        when(personRepository.findPersonByLastNameAndFirstName("Mike", "Cool")).thenReturn(null);
+        when(personRepository.findByLastNameAndFirstName("Mike", "Cool")).thenReturn(null);
         Assertions.assertThrows(PersonNotFoundException.class, () -> {
-            personService.findPersonByLastNameAndFirstName("Mike", "Cool");
+            personService.findByLastNameAndFirstName("Mike", "Cool");
         });
     }
 

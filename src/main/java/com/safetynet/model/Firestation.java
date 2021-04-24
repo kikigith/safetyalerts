@@ -6,21 +6,6 @@ public class Firestation {
     private int station;
     private String address;
 
-    public Firestation() {
-
-    }
-
-    public Firestation(int station, String address) {
-        super();
-        this.station = station;
-        this.address = address;
-    }
-
-    public Firestation(Integer station) {
-        super();
-        this.station = station;
-    }
-
     public int getStation() {
         return station;
     }
