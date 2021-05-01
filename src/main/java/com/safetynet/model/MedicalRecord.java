@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MedicalRecord {
+
     private String firstName;
 
     private String lastName;
@@ -17,10 +18,10 @@ public class MedicalRecord {
 
     private List<String> allergies;
 
+    public MedicalRecord() {}
 
     public MedicalRecord(String lastName, String firstName, Date birthdate, List<String> medications,
                          List<String> allergies) {
-        super();
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthdate = birthdate;

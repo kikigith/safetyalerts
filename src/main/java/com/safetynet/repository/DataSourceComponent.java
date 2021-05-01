@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class DataSourceComponent {
+public class DataSourceComponent  {
 
     private final Logger logger = LoggerFactory.getLogger(DataSourceComponent.class);
 
@@ -37,6 +37,10 @@ public class DataSourceComponent {
             logger.error(e.getMessage());
         }
     }
+
+    //public void run(ApplicationArguments args) throws Exception{
+        //this.loadJsonData();
+    //}
 
     /*public void serializeDataToFile(AlertsData data) {
         try (FileOutputStream fos = new FileOutputStream(jsonFile.getFile())) {

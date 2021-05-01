@@ -1,12 +1,17 @@
 package com.safetynet.model;
 
+import javax.validation.constraints.NotBlank;
+
 public class Person {
+    @NotBlank(message = "le prénom est obligatoire")
     private String lastName;
+    @NotBlank(message = "le nom est est obligatoire")
     private String firstName;
     private String address;
     private String city;
     private String zip;
     private String phone;
+    @NotBlank(message = "l'email est requis")
     private String email;
 
     public Person(String fname, String lname, String address, String city, String zip, String phone, String email) {
@@ -102,11 +107,8 @@ public class Person {
         } else if (!firstName.equals(other.firstName))
             return false;
         if (lastName == null) {
-            if (other.lastName != null)
-                return false;
-        } else if (!lastName.equals(other.lastName))
-            return false;
-        return true;
+            return other.lastName == null;
+        } else return lastName.equals(other.lastName);
     }
 
     @Override

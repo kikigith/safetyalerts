@@ -11,4 +11,8 @@ public interface PersonRepository {
     Person save(Person person);
     void delete(Person person);
     Person findByLastNameAndFirstName(String lastname, String firstname);
+
+    List<Person> getPersonsAtAddress(String address);
+
+    List<String> getPhonesPersonAtAddress(String address);
 }

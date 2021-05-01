@@ -4,6 +4,7 @@ import com.safetynet.model.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -43,5 +44,26 @@ public class PersonRepositoryImpl implements PersonRepository{
                 return person;
         }
         return null;
+    }
+
+    @Override
+    public List<Person> getPersonsAtAddress(String address){
+        List<Person> persons = new ArrayList<>();
+        dataSourceComponent.getPersons().forEach(p->{
+            if(p.getAddress().equalsIgnoreCase(address)) {
+                persons.add(p);
+            }
+        });
+        return persons;
+    }
+
+    public List<String> getPhonesPersonAtAddress(String address){
+        List<String> phones = new ArrayList<>();
+        dataSourceComponent.getPersons().forEach(p->{
+            if(p.getAddress().equalsIgnoreCase(address)) {
+                phones.add(p.getPhone());
+            }
+        });
+        return phones;
     }
 }

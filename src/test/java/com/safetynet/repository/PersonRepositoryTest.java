@@ -96,6 +96,11 @@ public class PersonRepositoryTest {
         Person updatedPerson = personRepository.save(newPerson);
         assertThat(persons).hasSize(3);
         assertThat(updatedPerson.getLastName()).isSameAs(newPerson.getLastName());
+        //todo : verifier les information qui ont mise à jour
+       assertThat(updatedPerson.getAddress()).isNotEqualTo("Rue 34, Porto");
+       assertThat(updatedPerson.getAddress()).isEqualTo("Rue 70 Malanville");
+       assertThat(updatedPerson.getPhone()).isNotEqualTo(person1.getPhone());
+       assertThat(updatedPerson.getPhone()).isEqualTo("098 3584 88");
     }
 
     @Test
@@ -114,5 +119,37 @@ public class PersonRepositoryTest {
         assertThat(foundPerson.getFirstName()).isSameAs(person2.getFirstName());
         assertThat(foundPerson.getEmail()).isSameAs(person2.getEmail());
         assertThat(foundPerson.getEmail()).isSameAs(person2.getEmail());
+    }
+
+    //todo: given_a_non_existing_firstname_lastname_should_return_null
+    @Test
+    public void given_a_non_existing_lastname_firstname_should_return_null() {
+        when(dataSourceComponent.getPersons()).thenReturn(persons);
+        Person foundPerson = personRepository.findByLastNameAndFirstName("marc","oliver");
+        assertThat(foundPerson).isNull();
+    }
+
+    /**
+     * given_an_address_should_return_resident_person - test getPersonsAtAddress
+     */
+    @Test
+    public void given_an_address_should_return_resident_persons_at_the_address(){
+        when(dataSourceComponent.getPersons()).thenReturn(persons);
+        List<Person> personsAtAddress = personRepository.getPersonsAtAddress("Rue 54 parakou");
+        assertThat(personsAtAddress).hasSize(2);
+        assertThat(personsAtAddress).contains(person).contains(person2);
+        assertThat(personsAtAddress).doesNotContain(person1);
+    }
+
+    /**
+     * given_an_address_should_return_resident_phone_numbers - test getPhonesPersonAtAddress
+     */
+    @Test
+    public void given_an_address_should_return_resident_phone_numbers(){
+        when(dataSourceComponent.getPersons()).thenReturn(persons);
+        List<String> personsPhones = personRepository.getPhonesPersonAtAddress("Rue 54 parakou");
+        assertThat(personsPhones).hasSize(2);
+        assertThat(personsPhones).contains(person.getPhone()).contains(person2.getPhone());
+        assertThat(personsPhones).doesNotContain(person1.getPhone());
     }
 }

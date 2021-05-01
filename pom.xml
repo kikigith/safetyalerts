@@ -25,6 +25,14 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
@@ -36,7 +44,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -78,7 +85,10 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <!--forkMode>once</forkMode>
+                    <forkCount>0</forkCount>
                     <argLine>-Xmx1024M </argLine>
+                    <reuseForks>false</reuseForks-->
                     <excludes>
                         <exclude>**/*IT.java</exclude>
                     </excludes>
@@ -110,6 +120,9 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <!--configuration>
+                          <propertyName>jaCoCoArgLine</propertyName>
+                        </configuration-->
                     </execution>
                     <execution>
                         <id>jacoco-report</id>
@@ -139,6 +152,16 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <dataFile>${jacoco.execution.data.file}</dataFile>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
         </plugins>
     </reporting>

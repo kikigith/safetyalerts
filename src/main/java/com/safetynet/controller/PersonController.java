@@ -1,7 +1,5 @@
 package com.safetynet.controller;
 
-import com.safetynet.exception.PersonInvalidException;
-import com.safetynet.exception.PersonNotFoundException;
 import com.safetynet.model.Person;
 import com.safetynet.service.PersonService;
 import org.slf4j.Logger;
@@ -11,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -27,8 +26,9 @@ public class PersonController {
      * @return an iterable list of persons
      */
     @GetMapping("/persons")
-    public List<Person> getPersons(){
-        return personService.findAll();
+    public ResponseEntity<List<Person>> getPersons(){
+        List<Person> persons = personService.findAll();
+        return new ResponseEntity<>(persons, HttpStatus.OK);
     }
 
     /**
@@ -37,34 +37,19 @@ public class PersonController {
      * @return - a new instance of person
      */
     @PostMapping("/person")
-    public ResponseEntity<Person> savePerson(@RequestParam("lastname") final String lastname,
-                                               @RequestParam("firstname") final String firstname,
-                                               @RequestBody Person person) throws PersonInvalidException, Exception{
+    public ResponseEntity<Person> savePerson(@Valid @RequestBody Person person) {
+        logger.info("Request = @RequestBody = {}", person);
+        if(person.getLastName().isEmpty() || person.getLastName().isBlank() ||
+           person.getFirstName().isEmpty() || person.getFirstName().isBlank() ||
+           person.getEmail().isEmpty() || person.getEmail().isBlank())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Person persistedPerson = personService.save(person);
 
-        logger.info("Request = @RequestBody = {}", person.toString());
-        Person persistedPerson = null;
-        persistedPerson = personService.save(person);
-
+        logger.error("Réponse = @ResponseBody = {} ", persistedPerson);
         return ResponseEntity
-                .created(URI.create(String.format("/person?lastname=" + lastname + "&firstname=" + firstname)))
+                .created(URI.create(String.format("/person?lastname=" + person.getLastName() + "&firstname=" + person.getFirstName())))
+                //.created(URI.create(String.format("/person")))
                 .body(persistedPerson);
-    }
-
-
-    /**
-     * Search - Search a person in the repository by firstName & lastName
-     *
-     * @return - an instance of person if found
-     */
-    @GetMapping("/person")
-    public ResponseEntity<Person> searchPerson(@RequestParam("lastname") final String lastname,
-                                               @RequestParam("firstname") final String firstname)
-                                                throws PersonInvalidException, PersonNotFoundException,Exception {
-
-        Person foundPerson = null;
-        foundPerson = personService.findByLastNameAndFirstName(lastname, firstname);
-
-        return new ResponseEntity<Person>(foundPerson, HttpStatus.OK);
     }
 
     /**
@@ -73,17 +58,36 @@ public class PersonController {
      * @return - an instance of ResponseEntity<Person>
      */
     @PutMapping("/person")
-    public ResponseEntity<Person> updatePerson(@RequestParam("lastname") final String lastname,
-                                               @RequestParam("firstname") final String firstname,
-                                               @RequestBody Person person) throws PersonNotFoundException, PersonInvalidException,Exception {
-        logger.info("Request = @RequestBody = {}", person.toString());
-        ResponseEntity<Person> response = null;
-        Person pers = personService.findByLastNameAndFirstName(lastname, firstname);
-        logger.info("Response = @ResponseBody = {}", pers.toString());
-        personService.save(pers);
-        response = ResponseEntity.ok().body(pers);
+    public ResponseEntity<Person> updatePerson(@Valid @RequestBody Person person){
+        logger.info("Request = @RequestBody = {}", person);
+        if(person.getLastName().isEmpty() || person.getLastName().isBlank() ||
+                person.getFirstName().isEmpty() || person.getFirstName().isBlank() ||
+                person.getEmail().isEmpty() || person.getEmail().isBlank())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Person updatedPerson = personService.update(person);
+        if(updatedPerson == null )
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        logger.error("Réponse = @ResponseBody = {} ",updatedPerson);
+        return ResponseEntity.accepted().body(updatedPerson);
+    }
 
-        return response;
+    /**
+     * Search - Search a person in the repository by firstName & lastName
+     *
+     * @return - an instance of person if found
+     */
+    @GetMapping("/person")
+    public ResponseEntity<Person> searchPerson(@RequestParam("lastname") final String lastname,
+                                               @RequestParam("firstname") final String firstname) {
+        logger.info("Request = recherche person avec prénom : " + lastname+ ", nom: "+ firstname);
+        if(lastname.isEmpty() || lastname.isBlank() ||
+                firstname.isEmpty() || firstname.isBlank() )
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Person foundPerson = personService.findByLastNameAndFirstName(lastname, firstname);
+        if(foundPerson == null )
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        logger.info("Réponse personne " +foundPerson);
+        return new ResponseEntity<>(foundPerson, HttpStatus.OK);
     }
 
     /**
@@ -96,15 +100,13 @@ public class PersonController {
      */
     @DeleteMapping("/person")
     public ResponseEntity<Person> deletePerson(@RequestParam("lastname") final String lastname,
-                                               @RequestParam("firstname") final String firstname)
-            throws PersonInvalidException, PersonNotFoundException, Exception {
-        ResponseEntity<Person> response = null;
+                                               @RequestParam("firstname") final String firstname) {
         logger.info("Request Delete person firstname {}, lastname{}", firstname, lastname);
         personService.delete(lastname, firstname);
-        response = new ResponseEntity<Person>(HttpStatus.ACCEPTED);
-
-        return response;
+        return  new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+
 
 
 }
