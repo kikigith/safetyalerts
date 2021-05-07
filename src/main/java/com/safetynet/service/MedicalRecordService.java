@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface MedicalRecordService {
     List<MedicalRecord> findAll();
-    MedicalRecord save(MedicalRecord medicalRecord) throws MedicalRecordInvalidException, Exception;
-    void delete(String lastname, String firstname) throws MedicalRecordNotFoundException, Exception;
-    MedicalRecord findByLastnameAndFirstname(String lastname, String firstname) throws MedicalRecordNotFoundException, Exception;
+    MedicalRecord save(MedicalRecord medicalRecord) throws MedicalRecordInvalidException;
+    void delete(String lastname, String firstname) throws MedicalRecordNotFoundException;
+    MedicalRecord update(MedicalRecord medicalRecord) throws MedicalRecordInvalidException, MedicalRecordNotFoundException;
+    MedicalRecord findByLastnameAndFirstname(String lastname, String firstname) throws MedicalRecordNotFoundException;
 }

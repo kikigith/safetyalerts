@@ -1,6 +1,7 @@
 package com.safetynet.service;
 
 import com.safetynet.exception.MedicalRecordInvalidException;
+import com.safetynet.exception.MedicalRecordNotFoundException;
 import com.safetynet.model.MedicalRecord;
 import com.safetynet.repository.MedicalRecordRepository;
 import com.safetynet.repository.MedicalRecordRepositoryImpl;
@@ -27,8 +28,8 @@ public class MedicalRecordServiceTest {
     private MedicalRecordRepositoryImpl medicalRecordRepository;
     @InjectMocks
     private MedicalRecordServiceImpl medicalRecordService;
-    protected MedicalRecord medicalRecord, invalidFirstnameMedicalRecord,
-            InvalidLastnameMedicalRecord, medicalRecord1, medicalRecord2;
+    protected MedicalRecord medicalRecord, invalidFirstnameMedicalRecord, nonExistingMedicalRecord,
+            invalidLastnameMedicalRecord, medicalRecord1, medicalRecord2, nullMedicalRecord;
     private List<MedicalRecord> medicalRecords;
 
     @BeforeEach
@@ -74,7 +75,15 @@ public class MedicalRecordServiceTest {
         medications4.add("uvitol:500mg");
         List<String> allergies4 = new ArrayList<>();
         allergies4.add("pentol");
-        InvalidLastnameMedicalRecord = new MedicalRecord("","Valentin",calendar3.getTime(),medications4,allergies4);
+        invalidLastnameMedicalRecord = new MedicalRecord("","Valentin",calendar4.getTime(),medications4,allergies4);
+
+        Calendar calendar5 = new GregorianCalendar(1987, 10, 05);
+        List<String> medications5 = new ArrayList<>();
+        medications5.add("zetiol:344mg");
+        medications5.add("uvitol:500mg");
+        List<String> allergies5 = new ArrayList<>();
+        allergies5.add("pentol");
+        nonExistingMedicalRecord = new MedicalRecord("Abou","Malick",calendar5.getTime(),medications5,allergies5);
     }
 
     /**
@@ -97,7 +106,7 @@ public class MedicalRecordServiceTest {
     @Test
     public void given_a_invalid_lastname_medicalrecord_save_should_raise_exception() throws Exception{
         Assertions.assertThrows(MedicalRecordInvalidException.class, () -> {
-            medicalRecordService.save(InvalidLastnameMedicalRecord);
+            medicalRecordService.save(invalidLastnameMedicalRecord);
         });
     }
 
@@ -111,6 +120,62 @@ public class MedicalRecordServiceTest {
             medicalRecordService.save(invalidFirstnameMedicalRecord);
         });
     }
+
+    /**
+     * given_a_null_medicalrecord_update_should_raise_exception - update: null medicalrecord
+     * @throws Exception
+     */
+    @Test
+    public void given_a_null_medicalrecord_update_should_raise_exception() throws Exception{
+        Assertions.assertThrows(MedicalRecordInvalidException.class, () -> {
+            medicalRecordService.update(nullMedicalRecord);
+        });
+    }
+
+    /**
+     * given_an_invalid_lastname_medicalrecord_update_should_raise_exception - update: invalid lastname
+     * @throws Exception
+     */
+    @Test
+    public void given_an_invalid_lastname_medicalrecord_update_should_raise_exception() throws Exception{
+        Assertions.assertThrows(MedicalRecordInvalidException.class, () -> {
+            medicalRecordService.update(invalidLastnameMedicalRecord);
+        });
+    }
+
+    /**
+     * given_an_invalid_firstname_medicalrecord_update_should_raise_exception - update : invalid firstname
+     * @throws Exception
+     */
+    @Test
+    public void given_an_invalid_firstname_medicalrecord_update_should_raise_exception() throws Exception{
+        Assertions.assertThrows(MedicalRecordInvalidException.class, () -> {
+            medicalRecordService.update(invalidFirstnameMedicalRecord);
+        });
+    }
+
+    @Test
+    public void given_a_non_existing_medicalrecord_update_should_raise_exception() throws Exception{
+        when(medicalRecordRepository.findByLastnameAndFirstname("Abou","Malick")).thenReturn(null);
+        Assertions.assertThrows(MedicalRecordNotFoundException.class, () -> {
+            medicalRecordService.update(nonExistingMedicalRecord
+            );
+        });
+    }
+
+    /**
+     * given_a_medicalrecord_update_should_save_changes - update : cas nominal
+     * @throws Exception
+     */
+    @Test
+    public void given_a_medicalrecord_update_should_save_changes() throws Exception{
+        when(medicalRecordRepository.findByLastnameAndFirstname("Bignon","Kossou")).thenReturn(medicalRecord2);
+        when(medicalRecordRepository.save(any())).thenReturn(medicalRecord2);
+        MedicalRecord updatedMedicalRecord = medicalRecordService.update(medicalRecord2);
+        verify(medicalRecordRepository).save(any(MedicalRecord.class));
+        assertThat(updatedMedicalRecord).isNotNull();
+    }
+
 
     /**
      * find_should_return_all_medicalrecords - findall
@@ -137,11 +202,34 @@ public class MedicalRecordServiceTest {
         //assertThat(medicalRecords).hasSize(2);
     }
 
+    /**
+     * given_a_non_existing_medicalrecord_delete_should_raise_exception - delete : non existing medicalrecord
+     * @throws Exception
+     */
     @Test
-    public void given_lastname_and_firstname_delete_should_return_medical_record() throws Exception{
+    public void given_a_non_existing_medicalrecord_delete_should_raise_exception() throws Exception{
+        when(medicalRecordRepository.findByLastnameAndFirstname("Abou","Malick")).thenReturn(null);
+        Assertions.assertThrows(MedicalRecordNotFoundException.class, () -> {
+            medicalRecordService.delete("Abou","Malick");
+        });
+    }
+
+    @Test
+    public void given_lastname_and_firstname_findbylastnameandfirstname_should_return_medical_record() throws Exception{
         when(medicalRecordRepository.findByLastnameAndFirstname("Paul","Tossou")).thenReturn(medicalRecord);
         MedicalRecord foundMedicalRecord = medicalRecordService.findByLastnameAndFirstname("Paul", "Tossou");
         assertThat(foundMedicalRecord.getFirstName()).isSameAs(medicalRecord.getFirstName());
     }
 
+    /**
+     * given_a_non_existing_medicalrecord_findbylastnameandfirstname_should_raise_exception - findbylastnameandfirstname : non existing medicalrecord
+     * @throws Exception
+     */
+    @Test
+    public void given_a_non_existing_medicalrecord_findbylastnameandfirstname_should_raise_exception() throws Exception{
+        when(medicalRecordRepository.findByLastnameAndFirstname("Abou","Malick")).thenReturn(null);
+        Assertions.assertThrows(MedicalRecordNotFoundException.class, () -> {
+            medicalRecordService.findByLastnameAndFirstname("Abou","Malick");
+        });
+    }
 }

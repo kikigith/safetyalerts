@@ -3,6 +3,7 @@ package com.safetynet.controller;
 import com.safetynet.exception.FirestationInvalidException;
 import com.safetynet.model.Firestation;
 import com.safetynet.service.FirestationService;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,43 +28,74 @@ public class FirestationController {
      * getFirestations - Get all firestations from the repository
      * @return - an iterable list
      */
-    @GetMapping("/firestations")
-    public List<Firestation> getFirestations(){
-        return firestationService.findAll();
+    @GetMapping("/stations")
+    public ResponseEntity<List<Firestation>> getFirestations(){
+        List<Firestation> firestations=new ArrayList<>();
+        firestations = firestationService.findAll();
+        return new ResponseEntity<>(firestations, HttpStatus.OK);
     }
 
-    @PostMapping("/firestation")
-    public ResponseEntity<Firestation> saveFirestation(@RequestBody Firestation firestation) throws
-            FirestationInvalidException,Exception {
+    @PostMapping("/station")
+    public ResponseEntity<Firestation> saveFirestation(@RequestBody Firestation firestation)  {
+        logger.info("Request = @RequestBody = {}",firestation);
+        if(firestation.getStation()<=0)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(firestation.getAddress().isBlank() || firestation.getAddress().isEmpty())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Firestation persistedFirestation = firestationService.save(firestation);
         return ResponseEntity.created(URI.create(String.format("/firestation"))).body(persistedFirestation);
     }
 
-    @GetMapping("/firestation")
-    public ResponseEntity<Firestation> searchFirestation(){
-        return null;
-    }
-
-    @PutMapping("/firestation")
-    public ResponseEntity<Firestation> updateFirestation(@RequestParam Integer stationId,
-                                                         @RequestBody Firestation firestation){
-        try {
-            Firestation frs = firestationService.findById(firestation.getStation());
-            firestationService.save(frs);
-            return ResponseEntity.ok().body(frs);
-        } catch (Exception e) {
-            e.printStackTrace();
+    @GetMapping("/station")
+    public ResponseEntity<Firestation> searchFirestationByStation(@RequestParam("stationId") final Integer station){
+        logger.info("Request=> recheche station avec id: " +station);
+        if(station <= 0 || !(station instanceof Integer)) {
+            logger.error("la Requête est mal formatée");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return null;
+        Firestation foundFirestation = firestationService.findByStation(station);
+        if(foundFirestation == null) {
+            logger.error("La station : " +station+ " n'existe pas");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        logger.info("Réponse=> résultat recheche station avec id: " +station+ ", firestation:" +foundFirestation);
+        return new ResponseEntity<>(foundFirestation, HttpStatus.OK);
     }
 
-    @DeleteMapping("/firestation")
+    @GetMapping("/stationAddress")
+    public ResponseEntity<Firestation> searchFirestationByAddress(@RequestParam("address") final String address){
+        logger.info("Request=> recheche station avec address: " +address);
+        if(address==null || address.isBlank() || address.isEmpty()) {
+            logger.error("la Requête est mal formatée");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Firestation foundFirestation = firestationService.findByAddress(address);
+        if(foundFirestation == null) {
+            logger.error("La station d'adresse: " +address+ " n'existe pas");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        logger.info("Réponse=> résultat recheche station avec addresse: " +address+ ", firestation:" +foundFirestation);
+        return new ResponseEntity<>(foundFirestation, HttpStatus.OK);
+    }
+
+    @PutMapping("/station")
+    public ResponseEntity<Firestation> updateFirestation(@RequestBody Firestation firestation){
+        logger.info("Request = Mise à jour @RequestBody = {}", firestation);
+        if(firestation.getStation()<=0)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(firestation.getAddress() == null || firestation.getAddress().isEmpty() || firestation.getAddress().isBlank())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Firestation updatedFirestation = firestationService.update(firestation);
+        if(updatedFirestation == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        logger.info("Réponse = Firestation @ResponseBody = {} " +updatedFirestation+ " mise à jour avec succès ");
+        return ResponseEntity.accepted().body(updatedFirestation);
+    }
+
+    @DeleteMapping("/station")
     public ResponseEntity<HttpStatus> deleteFirestation(@RequestParam Integer stationId){
-        try {
-            firestationService.delete(stationId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        logger.info("Request Delete firestation with id: " +stationId);
+        firestationService.delete(stationId);
         return new ResponseEntity<HttpStatus>(HttpStatus.ACCEPTED);
     }
 

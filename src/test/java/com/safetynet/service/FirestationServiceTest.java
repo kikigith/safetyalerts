@@ -26,7 +26,8 @@ public class FirestationServiceTest {
     @InjectMocks
     FirestationServiceImpl firestationService;
 
-    private Firestation firestation, firestation1, firestation2, invalidIdFirestaiton, invalidAddressFirestation;
+    private Firestation firestation, firestation1, firestation2,
+            invalidIdFirestaiton, invalidAddressFirestation, nonExistingFirestation;
     private List<Firestation> firestations;
 
     @BeforeEach
@@ -51,6 +52,10 @@ public class FirestationServiceTest {
         invalidAddressFirestation.setStation(2);
         invalidAddressFirestation.setAddress("");
 
+        nonExistingFirestation = new Firestation();
+        nonExistingFirestation.setStation(3);
+        nonExistingFirestation.setAddress("34 rue UAC");
+
         firestations = new ArrayList<>();
         firestations.add(firestation);
         firestations.add(firestation1);
@@ -64,7 +69,7 @@ public class FirestationServiceTest {
      * @throws Exception
      */
     @Test
-    public void given_a_valid_firestation_save_should_persist_the_person() throws FirestationInvalidException, Exception{
+    public void given_a_valid_firestation_save_should_persist_the_firestation() throws FirestationInvalidException, Exception{
         when(firestationRepository.save(any(Firestation.class))).thenReturn(firestation);
         Firestation savedFiresation = firestationService.save(firestation);
         verify(firestationRepository).save(any(Firestation.class));
@@ -93,6 +98,49 @@ public class FirestationServiceTest {
         });
     }
 
+    /**
+     * given_a_valid_firestation_update_should_save_changes - update: scenario nominal
+     * @throws Exception
+     */
+    @Test
+    public void given_a_valid_firestation_update_should_save_changes() throws Exception{
+        when(firestationRepository.findById(anyInt())).thenReturn(firestation);
+        when(firestationRepository.save(any())).thenReturn(firestation);
+        Firestation updatedFirestation = firestationService.update(firestation);
+        verify(firestationRepository).save(any(Firestation.class));
+        assertThat(updatedFirestation).isNotNull();
+    }
+
+    /**
+     * given_an_invalid_firestation_id_update_should_raise_exception - scenario alternatif
+     * @throws Exception
+     */
+    @Test
+    public void given_an_invalid_firestation_id_update_should_raise_exception() throws Exception {
+        Assertions.assertThrows(FirestationInvalidException.class, () ->{
+            firestationService.update(invalidIdFirestaiton);
+        });
+    }
+
+    /**
+     * given_an_invalid_firestation_address_update_should_raise_exception - scenario alternatif
+     * @throws Exception
+     */
+    @Test
+    public void given_an_invalid_firestation_address_update_should_raise_exception() throws Exception {
+        Assertions.assertThrows(FirestationInvalidException.class, () ->{
+            firestationService.update(invalidAddressFirestation);
+        });
+    }
+
+    @Test
+    public void given_a_non_existing_firestation_udpate_should_raise_exception() throws Exception{
+        when(firestationRepository.findById(3)).thenReturn(null);
+        Assertions.assertThrows(FirestationNotFoundException.class, ()->{
+            firestationService.update(nonExistingFirestation);
+        });
+    }
+
     @Test
     public void find_should_return_all_firestation() throws Exception{
         when(firestationRepository.findAll()).thenReturn(firestations);
@@ -113,16 +161,24 @@ public class FirestationServiceTest {
     }
 
     @Test
+    public void given_a_non_existing_firestation_id_delete_should_raise_Exception() throws Exception{
+        when(firestationRepository.findById(5)).thenReturn(null);
+        Assertions.assertThrows(FirestationNotFoundException.class, () -> {
+            firestationService.delete(5);
+        });
+    }
+
+    @Test
     public void given_an_id_findbyid_should_return_firestation() throws Exception{
         when(firestationRepository.findById(1)).thenReturn(firestation);
-        Firestation foundFirestation = firestationService.findById(1);
+        Firestation foundFirestation = firestationService.findByStation(1);
         assertThat(foundFirestation.getAddress()).isEqualTo("63 beaulieu");
     }
 
     @Test
     public void given_a_non_existing_firestation_id_find_should_raise_Exception() throws Exception{
         Assertions.assertThrows(FirestationNotFoundException.class, () -> {
-            firestationService.findById(5);
+            firestationService.findByStation(5);
         });
     }
 

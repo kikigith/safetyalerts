@@ -3,6 +3,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +40,29 @@ public class FirestationControllerTest extends AbstractControllerTest{
 
     private String address, city;
     private List<String> phones;
-    Firestation station1, station2;
+    Firestation station, station1, station2,
+            invalidIdFirestation,invalidAddressFirestation, nonExistingFirestation;
     Person person1, person2, person3, person4;
 
     @BeforeEach
     public void initTest() {
+        station = new Firestation();
+        station.setStation(1);
+        station.setAddress("Rue 34 Cotonou");
+
+
+        invalidIdFirestation = new Firestation();
+        invalidIdFirestation.setStation(-1);
+        invalidIdFirestation.setAddress("54 rue bonheur");
+
+        invalidAddressFirestation = new Firestation();
+        invalidAddressFirestation.setStation(3);
+        invalidAddressFirestation.setAddress("");
+
+        nonExistingFirestation = new Firestation();
+        nonExistingFirestation.setStation(4);
+        nonExistingFirestation.setAddress("56 avenue bio guera");
+
         address = "25 rue Beauchamp";
         phones = new ArrayList<>();
         phones.add("24 132 45");
@@ -50,43 +70,143 @@ public class FirestationControllerTest extends AbstractControllerTest{
 
     @Test
     public void getFirestations_should_return_all_firestations() throws Exception {
-        mockMvc.perform(get("/firestations")).andExpect(status().isOk());
+        mockMvc.perform(get("/stations")).andExpect(status().isOk());
     }
 
     @Test
     public void given_a_new_person_createFirestation_should_persist_the_firestation() throws Exception {
-        Firestation frs = new Firestation();
-        frs.setStation(1);
-        frs.setAddress("Rue 34 Cotonou");
-
-        String firestationJson = mapToJson(frs);
-
-        doReturn(frs).when(firestationService).save(any());
-
+        String firestationJson = mapToJson(station);
+        doReturn(station).when(firestationService).save(any());
         int status = mockMvc
-                .perform(post("/firestation").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
-                .andExpect(jsonPath("$.station", is(frs.getStation()))).andReturn().getResponse().getStatus();
+                .perform(post("/station").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andExpect(jsonPath("$.station", is(station.getStation()))).andReturn().getResponse().getStatus();
         assertEquals(201, status);
     }
 
     @Test
-    public void given_an_existing_firestation_save_should_update_the_firestation() throws Exception {
-        String uri = "/firestation?stationId=1";
-        Firestation frs = new Firestation();
-        frs.setStation(1);
-        frs.setAddress("Rue 35 Cotonou");
+    public void given_a_invalid_station_id_createFirestation_should_return_httpstatus_bad_request() throws Exception{
+        String firestationJson = mapToJson(invalidIdFirestation);
+        int status = mockMvc
+                .perform(post("/station").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getStatus();
+        assertEquals(400, status);
+    }
 
-        String firestationJson = mapToJson(frs);
+    @Test
+    public void given_a_invalid_address_createFirestation_should_return_httpstatus_bad_request() throws Exception{
+        String firestationJson = mapToJson(invalidAddressFirestation);
+        int status = mockMvc
+                .perform(post("/station").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getStatus();
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void given_an_existing_firestation_update_should_modify_the_firestation() throws Exception {
+        String uri = "/station";
+        Firestation newStation=new Firestation();
+        newStation.setStation(1);
+        newStation.setAddress("76 rue Kerekou");
+        String firestationJson = mapToJson(station);
+        when(firestationService.update(station)).thenReturn(newStation);
         int status = mockMvc.perform(put(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse().getStatus();
+        assertEquals(202, status);
+    }
+
+    @Test
+    public void given_an_invalid_station_id_update_should_return_httpstatus_bad_request() throws Exception{
+        String uri = "/station?stationId=-1";
+        String firestationJson = mapToJson(invalidIdFirestation);
+        when(firestationService.findByStation(-1)).thenReturn(invalidIdFirestation);
+        int status = mockMvc
+                .perform(put("/station").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getStatus();
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void given_an_invalid_address_update_should_return_httpstatus_bad_request() throws Exception{
+        String uri = "/station?stationId=3";
+        String firestationJson = mapToJson(invalidAddressFirestation);
+        when(firestationService.findByStation(3)).thenReturn(invalidAddressFirestation);
+        int status = mockMvc
+                .perform(put("/station").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getStatus();
+        assertEquals(400, status);
+    }
+
+    @Test
+    public void given_a_non_existing_firestation_update_should_return_httpstatus_not_found() throws Exception{
+        String uri = "/station?stationId=4";
+        String firestationJson = mapToJson(nonExistingFirestation);
+        when(firestationService.findByStation(4)).thenReturn(null);
+        int status = mockMvc
+                .perform(put("/firestation").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andExpect(status().isNotFound())
+                .andReturn().getResponse().getStatus();
+        assertEquals(404, status);
+    }
+
+
+    @Test
+    public void given_a_station_id_should_Delete_firestation() throws Exception {
+        String uri = "/station?stationId=1";
+        int status = mockMvc.perform(delete(uri)).andReturn().getResponse().getStatus();
+        assertEquals(202, status);
+    }
+
+    @Test
+    public void given_a_station_id_should_return_a_firestation() throws Exception {
+        String uri = "/station?stationId=1";
+        String firestationJson = mapToJson(station);
+        when(firestationService.findByStation(1)).thenReturn(station);
+        int status = mockMvc.perform(get(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.address",is("Rue 34 Cotonou")))
                 .andReturn().getResponse().getStatus();
         assertEquals(200, status);
     }
 
     @Test
-    public void given_a_station_id_should_Delete_firestation() throws Exception {
-        String uri = "/firestation?stationId=1";
-        int status = mockMvc.perform(delete(uri)).andReturn().getResponse().getStatus();
-        assertEquals(202, status);
+    public void given_a_non_existing_firestation_id_search_should_return_httpstatus_not_found() throws Exception{
+        String uri = "/station?stationId=4";
+        String firestationJson = mapToJson(nonExistingFirestation);
+        when(firestationService.findByStation(1)).thenReturn(null);
+        int status = mockMvc.perform(get(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isNotFound())
+                .andReturn().getResponse().getStatus();
+        assertEquals(404, status);
+    }
+
+    @Test
+    public void given_an_address_should_return_a_firestation() throws Exception {
+        String uri = "/stationAddress?address=Rue 34 Cotonou";
+        String firestationJson = mapToJson(station);
+        when(firestationService.findByAddress("Rue 34 Cotonou")).thenReturn(station);
+        int status = mockMvc.perform(get(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.station",is(1)))
+                .andReturn().getResponse().getStatus();
+        assertEquals(200, status);
+    }
+
+    @Test
+    public void given_a_non_existing_firestation_address_search_should_return_httpstatus_not_found() throws Exception{
+        String uri = "/stationAddress?address=56 avenue bio guera";
+        String firestationJson = mapToJson(nonExistingFirestation);
+        when(firestationService.findByStation(1)).thenReturn(null);
+        int status = mockMvc.perform(get(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isNotFound())
+                .andReturn().getResponse().getStatus();
+        assertEquals(404, status);
     }
 
 }
