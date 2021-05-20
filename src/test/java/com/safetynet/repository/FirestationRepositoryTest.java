@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,14 +27,17 @@ public class FirestationRepositoryTest {
     @BeforeEach
     public void initTests(){
         firestation = new Firestation();
+        firestation.setId(1);
         firestation.setStation(1);
         firestation.setAddress("43 rue masson");
 
         firestation1 = new Firestation();
+        firestation1.setId(2);
         firestation1.setStation(2);
         firestation1.setAddress("23 rue behanzin");
 
         firestation2 = new Firestation();
+        firestation2.setId(3);
         firestation2.setStation(3);
         firestation2.setAddress("53 rue soglo");
 
@@ -52,6 +57,7 @@ public class FirestationRepositoryTest {
     @Test
     public void given_a_new_firestation_save_should_persist_the_firestation() throws  Exception{
         Firestation newFirestation = new Firestation();
+        newFirestation.setId(4);
         newFirestation.setStation(4);
         newFirestation.setAddress("4 Avenue Toffa");
         when(dataSourceComponent.getFirestations()).thenReturn(firestations);
@@ -63,6 +69,7 @@ public class FirestationRepositoryTest {
     @Test
     public void given_an_existing_firestation_save_should_update_the_firestation() throws Exception{
         Firestation newFirestation = new Firestation();
+        newFirestation.setId(2);
         newFirestation.setStation(2);
         newFirestation.setAddress("034 rue Talon");
         when(dataSourceComponent.getFirestations()).thenReturn(firestations);
@@ -83,17 +90,17 @@ public class FirestationRepositoryTest {
     @Test
     public void given_an_id_findbyid_should_return_a_firestation() throws Exception{
         when(dataSourceComponent.getFirestations()).thenReturn(firestations);
-        Firestation foundFirestation = firestationRepository.findById(2);
-        assertThat(foundFirestation.getStation()).isSameAs(firestation1.getStation());
-        assertThat(foundFirestation.getAddress()).isSameAs(firestation1.getAddress());
+        Optional<Firestation> foundFirestation = firestationRepository.findById(2);
+        assertThat(foundFirestation.get().getStation()).isSameAs(firestation1.getStation());
+        assertThat(foundFirestation.get().getAddress()).isSameAs(firestation1.getAddress());
     }
 
     @Test
     public void given_an_address_findbyaddress_should_return_a_firestation() throws Exception{
         when(dataSourceComponent.getFirestations()).thenReturn(firestations);
-        Firestation foundFirestation = firestationRepository.findByAddress("53 rue soglo");
-        assertThat(foundFirestation.getStation()).isSameAs(firestation2.getStation());
-        assertThat(foundFirestation.getAddress()).isSameAs(firestation2.getAddress());
+        Optional<List<Firestation>> foundFirestation = firestationRepository.findByAddress("53 rue soglo");
+        assertThat(foundFirestation.get().get(0).getStation()).isSameAs(firestation2.getStation());
+        assertThat(foundFirestation.get().get(0).getAddress()).isSameAs(firestation2.getAddress());
     }
 
 }

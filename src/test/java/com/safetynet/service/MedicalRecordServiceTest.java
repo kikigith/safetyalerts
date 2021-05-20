@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -34,56 +35,58 @@ public class MedicalRecordServiceTest {
 
     @BeforeEach
     public void initTests(){
-        Calendar calendar = new GregorianCalendar(2000, 11, 03);
         List<String> medications = new ArrayList<>();
         medications.add("zetiol:344mg");
         medications.add("uvitol:500mg");
         List<String> allergies = new ArrayList<>();
         allergies.add("pentol");
-        medicalRecord = new MedicalRecord("Paul","Tossou",calendar.getTime(),medications,allergies);
-        Calendar calendar1 = new GregorianCalendar(1997, 04, 9);
+        LocalDate d = LocalDate.of(2000,11,3);
+        medicalRecord = new MedicalRecord(1,"Paul","Tossou",d,medications,allergies);
+
         List<String> medications1 = new ArrayList<>();
         medications1.add("feneol:300mg");
         medications1.add("bartim:500mg");
         List<String> allergies1 = new ArrayList<>();
         allergies1.add("zentol");
-        medicalRecord1 = new MedicalRecord("Reine","Fanou",calendar1.getTime(),medications1,allergies1);
-        Calendar calendar2 = new GregorianCalendar(2003, 11, 19);
+        LocalDate d1 = LocalDate.of(1997,4,4);
+        medicalRecord1 = new MedicalRecord(1,"Reine","Fanou",d1,medications1,allergies1);
+
         List<String> medications2 = new ArrayList<>();
         medications2.add("outrenol:200mg");
         medications2.add("albiotol:500mg");
         List<String> allergies2 = new ArrayList<>();
         allergies2.add("pentenol");
-        medicalRecord2 = new MedicalRecord("Bignon","Kossou",calendar2.getTime(),medications2,allergies2);
+        LocalDate d2 = LocalDate.of(2003,11,19);
+        medicalRecord2 = new MedicalRecord(3,"Bignon","Kossou",d2,medications2,allergies2);
 
         medicalRecords = new ArrayList<>();
         medicalRecords.add(medicalRecord);
         medicalRecords.add(medicalRecord1);
         medicalRecords.add(medicalRecord2);
 
-        Calendar calendar3 = new GregorianCalendar(2000, 11, 03);
         List<String> medications3 = new ArrayList<>();
         medications3.add("zetiol:344mg");
         medications3.add("uvitol:500mg");
         List<String> allergies3 = new ArrayList<>();
         allergies3.add("pentol");
-        invalidFirstnameMedicalRecord = new MedicalRecord("Paul","",calendar3.getTime(),medications3,allergies3);
+        LocalDate d3 = LocalDate.of(2000,11,3);
+        invalidFirstnameMedicalRecord = new MedicalRecord(4,"Paul","",d3,medications3,allergies3);
 
-        Calendar calendar4 = new GregorianCalendar(2000, 11, 03);
         List<String> medications4 = new ArrayList<>();
         medications4.add("zetiol:344mg");
         medications4.add("uvitol:500mg");
         List<String> allergies4 = new ArrayList<>();
         allergies4.add("pentol");
-        invalidLastnameMedicalRecord = new MedicalRecord("","Valentin",calendar4.getTime(),medications4,allergies4);
+        LocalDate d4 = LocalDate.of(2000,11,3);
+        invalidLastnameMedicalRecord = new MedicalRecord(5,"","Valentin",d4,medications4,allergies4);
 
-        Calendar calendar5 = new GregorianCalendar(1987, 10, 05);
         List<String> medications5 = new ArrayList<>();
         medications5.add("zetiol:344mg");
         medications5.add("uvitol:500mg");
         List<String> allergies5 = new ArrayList<>();
         allergies5.add("pentol");
-        nonExistingMedicalRecord = new MedicalRecord("Abou","Malick",calendar5.getTime(),medications5,allergies5);
+        LocalDate d5 = LocalDate.of(1987,10,5);
+        nonExistingMedicalRecord = new MedicalRecord(6,"Abou","Malick",d5,medications5,allergies5);
     }
 
     /**
@@ -174,6 +177,10 @@ public class MedicalRecordServiceTest {
         MedicalRecord updatedMedicalRecord = medicalRecordService.update(medicalRecord2);
         verify(medicalRecordRepository).save(any(MedicalRecord.class));
         assertThat(updatedMedicalRecord).isNotNull();
+        assertThat(updatedMedicalRecord.getAllergies()).isSameAs(medicalRecord2.getAllergies());
+        assertThat(updatedMedicalRecord.getMedications()).isSameAs(medicalRecord2.getMedications());
+        assertThat(updatedMedicalRecord.getBirthdate()).isSameAs(medicalRecord2.getBirthdate());
+
     }
 
 

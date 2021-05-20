@@ -135,7 +135,7 @@ public class PersonRepositoryTest {
     @Test
     public void given_an_address_should_return_resident_persons_at_the_address(){
         when(dataSourceComponent.getPersons()).thenReturn(persons);
-        List<Person> personsAtAddress = personRepository.getPersonsAtAddress("Rue 54 parakou");
+        List<Person> personsAtAddress = personRepository.findByAddress("Rue 54 parakou");
         assertThat(personsAtAddress).hasSize(2);
         assertThat(personsAtAddress).contains(person).contains(person2);
         assertThat(personsAtAddress).doesNotContain(person1);
@@ -147,7 +147,7 @@ public class PersonRepositoryTest {
     @Test
     public void given_an_address_should_return_resident_phone_numbers(){
         when(dataSourceComponent.getPersons()).thenReturn(persons);
-        List<String> personsPhones = personRepository.getPhonesPersonAtAddress("Rue 54 parakou");
+        List<String> personsPhones = personRepository.findByAddressAndSelectPhone("Rue 54 parakou");
         assertThat(personsPhones).hasSize(2);
         assertThat(personsPhones).contains(person.getPhone()).contains(person2.getPhone());
         assertThat(personsPhones).doesNotContain(person1.getPhone());

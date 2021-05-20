@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -70,12 +71,12 @@ public class DataSourceComponentTest {
         firestations.add(firestation);
 
         List<MedicalRecord> medicalRecords = new ArrayList<>();
-        Calendar calendar = new GregorianCalendar(2000, 11, 03);
         List<String> medications= new ArrayList<>();
         medications.add("citine:300mg");
         List<String> allergies= new ArrayList<>();
         allergies.add("phenotine");
-        MedicalRecord medicalRecord = new MedicalRecord("mike","fiver",calendar.getTime(),medications, allergies);
+        LocalDate d = LocalDate.of(2000,11,3);
+        MedicalRecord medicalRecord = new MedicalRecord(1,"mike","fiver",d,medications, allergies);
         medicalRecords.add(medicalRecord);
 
         alertsData = new AlertsData(persons,firestations,medicalRecords);

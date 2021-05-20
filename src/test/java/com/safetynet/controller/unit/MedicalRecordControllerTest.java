@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +46,8 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications = new ArrayList<>();
         medications.add("beotim:200mg");
         medications.add("flavoquine:400mg");
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        medicalRecord = new MedicalRecord("Dupont","Aline",sdf.parse("12-02-2001"),medications,allergies);
+        LocalDate d = LocalDate.of(2001,2,21);
+        medicalRecord = new MedicalRecord(1,"Dupont","Aline",d,medications,allergies);
 
         List<String> allergies1 = new ArrayList<>();
         allergies1.add("spatonine");
@@ -54,8 +55,8 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications1 = new ArrayList<>();
         medications1.add("beotim:200mg");
         medications1.add("flavoquine:400mg");
-        SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MM-yyyy");
-        invalidLastnameMedicalRecord = new MedicalRecord("","Pierre",sdf1.parse("21-02-2001"),medications1,allergies1);
+        LocalDate d1 = LocalDate.of(2001,2,21);
+        invalidLastnameMedicalRecord = new MedicalRecord(1,"","Pierre",d1,medications1,allergies1);
 
         List<String> allergies2 = new ArrayList<>();
         allergies2.add("spatonine");
@@ -63,8 +64,8 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications2 = new ArrayList<>();
         medications2.add("beotim:200mg");
         medications2.add("flavoquine:400mg");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
-        invalidFirstnameMedicalRecord = new MedicalRecord("Julie","",sdf2.parse("21-02-2001"),medications2,allergies2);
+        LocalDate d2 = LocalDate.of(2001,2,21);
+        invalidFirstnameMedicalRecord = new MedicalRecord(2,"Julie","",d2,medications2,allergies2);
 
         List<String> allergies3 = new ArrayList<>();
         allergies3.add("spatonine");
@@ -72,8 +73,8 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications3 = new ArrayList<>();
         medications3.add("beotim:200mg");
         medications3.add("flavoquine:400mg");
-        SimpleDateFormat sdf3 = new SimpleDateFormat("dd-MM-yyyy");
-        nonExistingMedicalRecord = new MedicalRecord("Julie","Pierre",sdf3.parse("21-02-2001"),medications3,allergies3);
+        LocalDate d3 = LocalDate.of(2001,2,21);
+        nonExistingMedicalRecord = new MedicalRecord(3,"Julie","Pierre",d3,medications3,allergies3);
     }
 
     @Test
@@ -94,6 +95,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         int status = mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(medicalRecordJson))
                 .andExpect(jsonPath("$.firstName", is(medicalRecord.getFirstName())))
+                .andDo(MockMvcResultHandlers.print())
                 .andReturn().getResponse().getStatus();
         assertEquals(201, status);
     }
@@ -129,8 +131,8 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications = new ArrayList<>();
         medications.add("quinine:200mg");
         medications.add("chloroquine:400mg");
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        MedicalRecord newMedicalRecord = new MedicalRecord("Dupont","Aline",sdf.parse("15-02-2001"),medications,allergies);
+        LocalDate d = LocalDate.of(2001,2,15);
+        MedicalRecord newMedicalRecord = new MedicalRecord(4,"Dupont","Aline",d,medications,allergies);
 
 
         String medicalRecordJson = mapToJson(newMedicalRecord);
