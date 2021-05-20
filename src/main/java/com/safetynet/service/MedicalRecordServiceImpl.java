@@ -1,10 +1,7 @@
 package com.safetynet.service;
 
-import com.safetynet.exception.FirestationInvalidException;
-import com.safetynet.exception.FirestationNotFoundException;
 import com.safetynet.exception.MedicalRecordInvalidException;
 import com.safetynet.exception.MedicalRecordNotFoundException;
-import com.safetynet.model.Firestation;
 import com.safetynet.model.MedicalRecord;
 import com.safetynet.repository.MedicalRecordRepository;
 import org.slf4j.Logger;
@@ -48,8 +45,6 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
         MedicalRecord foundMedicalRecordToUpdate = medicalRecordRepository.findByLastnameAndFirstname(medicalRecord.getLastName(),medicalRecord.getFirstName());
         if(foundMedicalRecordToUpdate == null)
             throw new MedicalRecordNotFoundException("Le MedicalRecord de prénom: " + medicalRecord.getLastName()+ ", nom: " +medicalRecord.getFirstName()+ " n'existe pas");
-        //foundMedicalRecordToUpdate.setLastName(medicalRecord.getLastName());
-        //foundMedicalRecordToUpdate.setFirstName(medicalRecord.getFirstName());
         foundMedicalRecordToUpdate.setBirthdate(medicalRecord.getBirthdate());
         foundMedicalRecordToUpdate.setAllergies(medicalRecord.getAllergies());
         foundMedicalRecordToUpdate.setMedications(medicalRecord.getMedications());
@@ -76,7 +71,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService{
         if(foundMedicalRecord == null){
             throw new MedicalRecordNotFoundException("Aucun medicalrecord  nom : "+lastname+" prénom: "+firstname+ "n'existe ");
         }
-        logger.info("Réponse ==> medicalrecord : "+foundMedicalRecord.toString());
+        logger.info("Réponse ==> medicalrecord : "+foundMedicalRecord);
         return foundMedicalRecord;
     }
 }

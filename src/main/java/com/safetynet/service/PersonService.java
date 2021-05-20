@@ -14,4 +14,5 @@ public interface PersonService {
     Person findByLastNameAndFirstName(String lastname, String firstname) throws PersonNotFoundException;
     List<Person> getPersonsAtAddress(String address);
     List<String> getPhonesPersonsAtAddress(String address);
+    List<Person> findAllByLastnameAndFirstname(String lastname, String firstname) throws PersonNotFoundException;
 }

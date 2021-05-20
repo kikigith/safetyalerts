@@ -1,8 +1,7 @@
 package com.safetynet.service;
 
 import com.safetynet.exception.FirestationNotFoundException;
-import com.safetynet.model.dto.ChildrenCoveredDTO;
-import com.safetynet.model.dto.PersonsCoveredByStation;
+import com.safetynet.model.dto.*;
 
 import java.util.List;
 
@@ -11,4 +10,8 @@ public interface CommonService {
     ChildrenCoveredDTO produceChildrenAtAddress(String address);
     List<String> getResidentPhoneNumber(int stationId) throws FirestationNotFoundException;
     List<String> getCommunityEmails(String city);
+    PersonsCoveredAtAddress getAddressCoverage(String address);
+    List<PersonMedicalDetailsDTO> getPersonMedicalDetails(String lastname, String firstname);
+    List<PersonsCoveredAtAddress> getAddressesCoverage(List<String> stationId);
+
 }

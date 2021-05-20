@@ -47,7 +47,7 @@ public class PersonRepositoryImpl implements PersonRepository{
     }
 
     @Override
-    public List<Person> getPersonsAtAddress(String address){
+    public List<Person> findByAddress(String address){
         List<Person> persons = new ArrayList<>();
         dataSourceComponent.getPersons().forEach(p->{
             if(p.getAddress().equalsIgnoreCase(address)) {
@@ -57,7 +57,7 @@ public class PersonRepositoryImpl implements PersonRepository{
         return persons;
     }
 
-    public List<String> getPhonesPersonAtAddress(String address){
+    public List<String> findByAddressAndSelectPhone(String address){
         List<String> phones = new ArrayList<>();
         dataSourceComponent.getPersons().forEach(p->{
             if(p.getAddress().equalsIgnoreCase(address)) {
@@ -65,5 +65,17 @@ public class PersonRepositoryImpl implements PersonRepository{
             }
         });
         return phones;
+    }
+
+    @Override
+    public List<Person> findAllByLastNameAndFirstName(String lastname, String firstname) {
+        List<Person> persons = new ArrayList<>();
+        dataSourceComponent.getPersons().forEach(person -> {
+            if(person.getLastName().equalsIgnoreCase(lastname) &&
+                    person.getFirstName().equalsIgnoreCase(firstname)){
+                persons.add(person);
+            }
+        });
+        return persons;
     }
 }

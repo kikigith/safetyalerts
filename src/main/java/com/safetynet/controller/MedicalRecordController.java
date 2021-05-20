@@ -46,13 +46,13 @@ public class MedicalRecordController {
         MedicalRecord persistedMedicalRecord = medicalRecordService.save(medicalRecord);
 
         return ResponseEntity
-                .created(URI.create(String.format("/medicalrecord?lastname=" + medicalRecord.getLastName() + "&firstname=" + medicalRecord.getFirstName())))
+                .created(URI.create("/medicalrecord?lastname=" + medicalRecord.getLastName() + "&firstname=" + medicalRecord.getFirstName()))
                 .body(persistedMedicalRecord);
     }
 
     /**
      * updateMedicalRecord  - update an existing medicalrecord
-     * @return
+     * @return - retourne un medicalrecord
      */
     @PutMapping("/medicalrecord")
     public ResponseEntity<MedicalRecord> updateMedicalRecord(@RequestBody MedicalRecord medicalRecord){
@@ -64,17 +64,16 @@ public class MedicalRecordController {
         MedicalRecord updatedMedicalRecord = medicalRecordService.update(medicalRecord);
         if(updatedMedicalRecord == null )
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        logger.error("Réponse = @ResponseBody = {} " +updatedMedicalRecord);
+        logger.error("Réponse = @ResponseBody = {} ",updatedMedicalRecord);
 
         return ResponseEntity.accepted().body(updatedMedicalRecord);
     }
 
     /**
      *  searchMedicalRecord - Search a MedicalRecord in the repository by firstName & lastName
-     * @param lastname
-     * @param firstname
-     * @return
-     * @throws Exception
+     * @param lastname - prénom
+     * @param firstname - nom
+     * @return - retourne un medicalrecord
      */
     @GetMapping("/medicalrecord")
     public ResponseEntity<MedicalRecord> searchMedicalRecord(@RequestParam("lastname") final String lastname,
@@ -87,21 +86,20 @@ public class MedicalRecordController {
         if(foundMedicalRecord == null )
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         logger.error("Réponse MedicalRecord : " +foundMedicalRecord);
-        return new ResponseEntity<MedicalRecord>(foundMedicalRecord,HttpStatus.OK);
+        return new ResponseEntity<>(foundMedicalRecord,HttpStatus.OK);
     }
 
     /**
      * Delete - Delete a medicalrecord
-     * @param lastname
-     * @param firstname
-     * @return
+     * @param lastname - prénom
+     * @param firstname - nom
+     * @return - retourne un medicalrecord
      */
     @DeleteMapping("/medicalrecord")
     public ResponseEntity<MedicalRecord> deleteMedicalRecord(@RequestParam("lastname") final String lastname,
                                                              @RequestParam("firstname") final String firstname) {
         logger.info("Request Delete medicalrecord firstname {}, lastname{}", firstname, lastname);
-        ResponseEntity<MedicalRecord> response = null;
         medicalRecordService.delete(lastname, firstname);
-        return new ResponseEntity<MedicalRecord>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

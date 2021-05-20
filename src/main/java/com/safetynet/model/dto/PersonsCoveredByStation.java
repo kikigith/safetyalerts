@@ -6,7 +6,7 @@ import java.util.List;
 
 public class PersonsCoveredByStation {
     int stationId;
-    List<Person> persons;
+    List<PersonInfoDTO> persons;
     int nombreAdults;
     int nombreEnfants;
 
@@ -18,11 +18,11 @@ public class PersonsCoveredByStation {
         this.stationId = stationId;
     }
 
-    public List<Person> getPersons() {
+    public List<PersonInfoDTO> getPersons() {
         return persons;
     }
 
-    public void setPersons(List<Person> persons) {
+    public void setPersons(List<PersonInfoDTO> persons) {
         this.persons = persons;
     }
 

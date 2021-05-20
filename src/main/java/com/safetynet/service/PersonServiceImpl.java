@@ -85,7 +85,7 @@ public class PersonServiceImpl implements  PersonService{
     @Override
     public List<Person> getPersonsAtAddress(String address) {
         logger.info("Recherche des personnes résidant à l'adresse: "+address);
-        List<Person> persons = personRepository.getPersonsAtAddress(address);
+        List<Person> persons = personRepository.findByAddress(address);
         logger.info("Résultat de la recherche des personnes : " + persons);
         return persons;
     }
@@ -93,8 +93,16 @@ public class PersonServiceImpl implements  PersonService{
     @Override
     public List<String> getPhonesPersonsAtAddress(String address) {
         logger.info("Recherche des personnes résidant à l'adresse: "+address);
-        List<String> personsPhones = personRepository.getPhonesPersonAtAddress(address);
+        List<String> personsPhones = personRepository.findByAddressAndSelectPhone(address);
         logger.info("Résultat des numéros des personnes : " + personsPhones);
         return personsPhones;
+    }
+
+    @Override
+    public List<Person> findAllByLastnameAndFirstname(String lastname, String firstname) throws PersonNotFoundException {
+        logger.info("Recherche des personnes avec nom {} et prénom {} ",lastname,firstname);
+        List<Person> persons = personRepository.findAllByLastNameAndFirstName(lastname,firstname);
+        logger.info("Résultat recherche des personnes : " + persons);
+        return persons;
     }
 }

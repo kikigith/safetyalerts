@@ -1,20 +1,24 @@
 package com.safetynet.model;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class Person {
-    @NotBlank(message = "le prénom est obligatoire")
+    //@NotNull
+    private int id;
+    //@NotBlank(message = "le prénom est obligatoire")
     private String lastName;
-    @NotBlank(message = "le nom est est obligatoire")
+    //@NotBlank(message = "le nom est est obligatoire")
     private String firstName;
     private String address;
     private String city;
     private String zip;
     private String phone;
-    @NotBlank(message = "l'email est requis")
+    //@NotBlank(message = "l'email est requis")
     private String email;
 
-    public Person(String fname, String lname, String address, String city, String zip, String phone, String email) {
+    public Person(int id, String fname, String lname, String address, String city, String zip, String phone, String email) {
+        this.setId(id);
         this.setLastName(lname);
         this.setFirstName(fname);
         this.setAddress(address);
@@ -25,6 +29,14 @@ public class Person {
     }
 
     public Person() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getLastName() {

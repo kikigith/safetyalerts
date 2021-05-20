@@ -1,9 +1,8 @@
 package com.safetynet.controller;
 
-import com.safetynet.exception.FirestationInvalidException;
+
 import com.safetynet.model.Firestation;
 import com.safetynet.service.FirestationService;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -30,8 +28,7 @@ public class FirestationController {
      */
     @GetMapping("/stations")
     public ResponseEntity<List<Firestation>> getFirestations(){
-        List<Firestation> firestations=new ArrayList<>();
-        firestations = firestationService.findAll();
+        List<Firestation> firestations = firestationService.findAll();
         return new ResponseEntity<>(firestations, HttpStatus.OK);
     }
 
@@ -43,17 +40,17 @@ public class FirestationController {
         if(firestation.getAddress().isBlank() || firestation.getAddress().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Firestation persistedFirestation = firestationService.save(firestation);
-        return ResponseEntity.created(URI.create(String.format("/firestation"))).body(persistedFirestation);
+        return ResponseEntity.created(URI.create("/firestation")).body(persistedFirestation);
     }
 
     @GetMapping("/station")
     public ResponseEntity<Firestation> searchFirestationByStation(@RequestParam("stationId") final Integer station){
         logger.info("Request=> recheche station avec id: " +station);
-        if(station <= 0 || !(station instanceof Integer)) {
+        if(station <= 0 ) {
             logger.error("la Requête est mal formatée");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Firestation foundFirestation = firestationService.findByStation(station);
+        Firestation foundFirestation = firestationService.findById(station);
         if(foundFirestation == null) {
             logger.error("La station : " +station+ " n'existe pas");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -63,13 +60,13 @@ public class FirestationController {
     }
 
     @GetMapping("/stationAddress")
-    public ResponseEntity<Firestation> searchFirestationByAddress(@RequestParam("address") final String address){
+    public ResponseEntity<List<Firestation>> searchFirestationByAddress(@RequestParam("address") final String address){
         logger.info("Request=> recheche station avec address: " +address);
         if(address==null || address.isBlank() || address.isEmpty()) {
             logger.error("la Requête est mal formatée");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Firestation foundFirestation = firestationService.findByAddress(address);
+        List<Firestation> foundFirestation = firestationService.findByAddress(address);
         if(foundFirestation == null) {
             logger.error("La station d'adresse: " +address+ " n'existe pas");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -88,7 +85,7 @@ public class FirestationController {
         Firestation updatedFirestation = firestationService.update(firestation);
         if(updatedFirestation == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        logger.info("Réponse = Firestation @ResponseBody = {} " +updatedFirestation+ " mise à jour avec succès ");
+        logger.info("Réponse = Firestation @ResponseBody = {} ", updatedFirestation+ " mise à jour avec succès ");
         return ResponseEntity.accepted().body(updatedFirestation);
     }
 
@@ -96,7 +93,7 @@ public class FirestationController {
     public ResponseEntity<HttpStatus> deleteFirestation(@RequestParam Integer stationId){
         logger.info("Request Delete firestation with id: " +stationId);
         firestationService.delete(stationId);
-        return new ResponseEntity<HttpStatus>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 }

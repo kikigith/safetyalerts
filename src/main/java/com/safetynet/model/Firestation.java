@@ -3,8 +3,17 @@ package com.safetynet.model;
 import java.util.Objects;
 
 public class Firestation {
+    private int id;
     private int station;
     private String address;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getStation() {
         return station;

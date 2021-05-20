@@ -2,13 +2,14 @@ package com.safetynet.utils;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Date;
 
 public class Utils {
-    public static int calculateAge(Date bdate) {
+    public static int calculateAge(LocalDate bdate) {
         LocalDate today = LocalDate.now();
-        LocalDate bDat = LocalDate.of(bdate.getYear(), bdate.getMonth(), bdate.getDay());
+        LocalDate bDat = LocalDate.of(bdate.getYear(), bdate.getMonth(), bdate.getDayOfMonth());
         Period period = Period.between(bDat, today);
-        return period.getYears();
+        int age = today.getYear()- bdate.getYear();
+        return age;
+        //return period.getYears();
     }
 }

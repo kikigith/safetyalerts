@@ -1,9 +1,14 @@
 package com.safetynet.model.dto;
 
-public class ChildDTO {
+import java.util.List;
+import java.util.Map;
+
+public class PersonMedicalInfoDTO {
     String firstname;
     String lastname;
+    String phone;
     int age;
+    Map<String, List<String>> antecedents;
 
     public String getFirstname() {
         return firstname;
@@ -21,6 +26,14 @@ public class ChildDTO {
         this.lastname = lastname;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public int getAge() {
         return age;
     }
@@ -29,7 +42,11 @@ public class ChildDTO {
         this.age = age;
     }
 
+    public Map<String,List<String>> getAntecedents() {
+        return antecedents;
+    }
 
-
-
+    public void setAntecedents(Map<String, List<String>> antecedents) {
+        this.antecedents = antecedents;
+    }
 }

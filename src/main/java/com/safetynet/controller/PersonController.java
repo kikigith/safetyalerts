@@ -37,7 +37,7 @@ public class PersonController {
      * @return - a new instance of person
      */
     @PostMapping("/person")
-    public ResponseEntity<Person> savePerson(@Valid @RequestBody Person person) {
+    public ResponseEntity<Person> savePerson( @RequestBody Person person) {
         logger.info("Request = @RequestBody = {}", person);
         if(person.getLastName().isEmpty() || person.getLastName().isBlank() ||
            person.getFirstName().isEmpty() || person.getFirstName().isBlank() ||
@@ -47,7 +47,7 @@ public class PersonController {
 
         logger.error("Réponse = @ResponseBody = {} ", persistedPerson);
         return ResponseEntity
-                .created(URI.create(String.format("/person?lastname=" + person.getLastName() + "&firstname=" + person.getFirstName())))
+                .created(URI.create("/person?lastname=" + person.getLastName() + "&firstname=" + person.getFirstName()))
                 //.created(URI.create(String.format("/person")))
                 .body(persistedPerson);
     }
@@ -58,7 +58,7 @@ public class PersonController {
      * @return - an instance of ResponseEntity<Person>
      */
     @PutMapping("/person")
-    public ResponseEntity<Person> updatePerson(@Valid @RequestBody Person person){
+    public ResponseEntity<Person> updatePerson( @RequestBody Person person){
         logger.info("Request = @RequestBody = {}", person);
         if(person.getLastName().isEmpty() || person.getLastName().isBlank() ||
                 person.getFirstName().isEmpty() || person.getFirstName().isBlank() ||

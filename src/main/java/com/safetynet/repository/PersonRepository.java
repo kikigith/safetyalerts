@@ -12,7 +12,8 @@ public interface PersonRepository {
     void delete(Person person);
     Person findByLastNameAndFirstName(String lastname, String firstname);
 
-    List<Person> getPersonsAtAddress(String address);
+    List<Person> findByAddress(String address);
 
-    List<String> getPhonesPersonAtAddress(String address);
+    List<String> findByAddressAndSelectPhone(String address);
+    List<Person> findAllByLastNameAndFirstName(String lastname, String firstname);
 }

@@ -38,9 +38,7 @@ public class DataSourceComponent  {
         }
     }
 
-    //public void run(ApplicationArguments args) throws Exception{
-        //this.loadJsonData();
-    //}
+
 
     /*public void serializeDataToFile(AlertsData data) {
         try (FileOutputStream fos = new FileOutputStream(jsonFile.getFile())) {
@@ -63,7 +61,5 @@ public class DataSourceComponent  {
         return data.getMedicalrecords();
     }
 
-    /*public AlertsData getData(){
-        return  data;
-    }*/
+
 }
