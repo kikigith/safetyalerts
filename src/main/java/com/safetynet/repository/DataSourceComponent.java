@@ -7,12 +7,14 @@ import com.safetynet.model.MedicalRecord;
 import com.safetynet.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Component
@@ -20,6 +22,8 @@ public class DataSourceComponent  {
 
     private final Logger logger = LoggerFactory.getLogger(DataSourceComponent.class);
 
+    @Autowired
+    ObjectMapper objectMapper;
     @Value("${json.file.location}")
     private Resource jsonFile;
     private AlertsData data;
@@ -31,12 +35,22 @@ public class DataSourceComponent  {
     @PostConstruct
     public void loadJsonData() {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             data = objectMapper.readValue(jsonFile.getFile(), AlertsData.class);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
+
+    public List<Person> getPersons() {
+        return data.getPersons();
+    }
+    public List<Firestation> getFirestations() {
+        return data.getFirestations();
+    }
+    public List<MedicalRecord> getMedicalrecords() {
+        return data.getMedicalrecords();
+    }
+
 
 
 
@@ -48,18 +62,4 @@ public class DataSourceComponent  {
             ioe.printStackTrace();
         }
     }*/
-
-    public List<Person> getPersons() {
-        return data.getPersons();
-    }
-
-    public List<Firestation> getFirestations() {
-        return data.getFirestations();
-    }
-
-    public List<MedicalRecord> getMedicalrecords() {
-        return data.getMedicalrecords();
-    }
-
-
 }

@@ -114,7 +114,8 @@ public class CommonController {
     @GetMapping("/flood/stations")
     public ResponseEntity<List<PersonsCoveredAtAddress>> getAddressesCovered(@RequestParam("stations") List<String> stations){
         logger.info("Request => personnes couvertes par les station {}", stations);
-
-        return null;
+        List<PersonsCoveredAtAddress> personsCoveredAtAddresses =commonService.getAddressesCoverage(stations);
+        logger.info("Réponse => personnes : {}", personsCoveredAtAddresses);
+        return new ResponseEntity<>(personsCoveredAtAddresses, HttpStatus.OK);
     }
 }

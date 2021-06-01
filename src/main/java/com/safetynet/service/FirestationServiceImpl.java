@@ -39,28 +39,45 @@ public class FirestationServiceImpl implements FirestationService{
 
     @Override
     public Firestation update(Firestation firestation) throws FirestationInvalidException, FirestationNotFoundException {
+        Firestation updatedFirestation;
         if(firestation.getId()<=0)
             throw new FirestationInvalidException(" L'ID de la station doit être un entier positif non nul");
         if( firestation.getAddress()==null || firestation.getAddress().isEmpty() || firestation.getAddress().isBlank())
             throw new FirestationInvalidException(" L'addresse de la station doit être une chaine non vide");
         logger.info("Updating  firestation id: '" + firestation.getStation() + "' address: '" + firestation.getAddress());
         Optional<Firestation> foundFirestationToUpdate = firestationRepository.findById(firestation.getId());
-        if(foundFirestationToUpdate.isEmpty())
+        if(foundFirestationToUpdate.isEmpty() && (firestationRepository.findByStation(firestation.getStation()).get()==null))
             throw new FirestationNotFoundException("La stationd ID: " +firestation.getStation()+ ", address: " +firestation.getAddress()+ " n'existe pas");
+        else{
+            if(foundFirestationToUpdate.isPresent()){
+                updatedFirestation = foundFirestationToUpdate.get();
+                updatedFirestation.setAddress(firestation.getAddress());
+            }else{
+                List<Firestation> stations = firestationRepository.findByStation(firestation.getStation()).get();
+                updatedFirestation = stations.get(0);
+            }
+        }
         //foundFirestationToUpdate.setStation(firestation.getStation());
-        foundFirestationToUpdate.get().setAddress(firestation.getAddress());
+
         logger.info("firestation [" + firestation+ "] updated successfully");
-        return firestationRepository.save(foundFirestationToUpdate.get());
+        return firestationRepository.save(updatedFirestation);
     }
 
     @Override
     public void delete(int id) throws FirestationNotFoundException {
+        Firestation firestationToDelete;
         Optional<Firestation> firestation = firestationRepository.findById(id);
         logger.info("Requête=> Suppression firestation id : "+id);
-        if(firestation.isEmpty() )
+        if(firestation.isEmpty() && firestationRepository.findByStation(id).isEmpty())
             throw new FirestationNotFoundException("La station d'ID: " +id+ " n'existe pas ");
-        firestationRepository.delete(firestation.get());
-        logger.info("Firestation  [id:" + id + " address:" + firestation.get().getAddress() + "] supprimée avec succès");
+        else{
+            if(firestation.isPresent())
+                firestationToDelete = firestation.get();
+            else
+                firestationToDelete = firestationRepository.findByStation(id).get().get(0);
+        }
+        firestationRepository.delete(firestationToDelete);
+        logger.info("Firestation  [id:" + id + " address:" + firestationToDelete.getAddress() + "] supprimée avec succès");
     }
 
     @Override

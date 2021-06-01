@@ -43,33 +43,36 @@ public class CommonServiceImpl implements CommonService {
         AtomicInteger nombreEnfants = new AtomicInteger();
         AtomicInteger nombreAdultes = new AtomicInteger();
         Optional<Firestation> firestation = firestationRepository.findById(stationId);
-        if (firestation.isEmpty())
+        if (firestation.isEmpty() && firestationRepository.findByStation(stationId).isEmpty())
             throw new FirestationNotFoundException("La station d'id : " + stationId + " n'existe pas");
-        List<PersonInfoDTO> personsInfoDTOCovered = new ArrayList<>();
+        else
+            if(firestationRepository.findByStation(stationId).isPresent()) {
 
-        List<Person> personsCovered = personRepository.findByAddress(firestation.get().getAddress());
-        personsCovered.forEach(personCovered -> {
-            MedicalRecord medicalRecord = medicalRecordRepository.findByLastnameAndFirstname(personCovered.getLastName(), personCovered.getFirstName());
-            PersonInfoDTO personInfo = new PersonInfoDTO();
-            personInfo.setLastname(personCovered.getLastName());
-            personInfo.setFirstname(personCovered.getFirstName());
-            personInfo.setPhone(personCovered.getPhone());
-            personInfo.setAddresse(personCovered.getAddress());
-            personsInfoDTOCovered.add(personInfo);
-            if (Utils.calculateAge(medicalRecord.getBirthdate()) <= 18) {
-                nombreEnfants.getAndIncrement();
-            } else {
-                nombreAdultes.getAndIncrement();
+                List<PersonInfoDTO> personsInfoDTOCovered = new ArrayList<>();
+
+                List<Person> personsCovered = personRepository.findByAddress(firestationRepository.findByStation(stationId).get().get(0).getAddress());
+                personsCovered.forEach(personCovered -> {
+                    MedicalRecord medicalRecord = medicalRecordRepository.findByLastnameAndFirstname(personCovered.getLastName(), personCovered.getFirstName());
+                    PersonInfoDTO personInfo = new PersonInfoDTO();
+                    personInfo.setLastname(personCovered.getLastName());
+                    personInfo.setFirstname(personCovered.getFirstName());
+                    personInfo.setPhone(personCovered.getPhone());
+                    personInfo.setAddresse(personCovered.getAddress());
+                    personsInfoDTOCovered.add(personInfo);
+                    if (Utils.calculateAge(medicalRecord.getBirthdate()) <= 18) {
+                        nombreEnfants.getAndIncrement();
+                    } else {
+                        nombreAdultes.getAndIncrement();
+                    }
+                });
+
+
+                personsCoveredByStation.setStationId(stationId);
+                personsCoveredByStation.setPersons(personsInfoDTOCovered);
+                personsCoveredByStation.setNombreEnfants(nombreEnfants.get());
+                personsCoveredByStation.setNombreAdults(nombreAdultes.get());
+                logger.info("Couverture station  " + personsCoveredByStation);
             }
-        });
-
-
-        personsCoveredByStation.setStationId(stationId);
-        personsCoveredByStation.setPersons(personsInfoDTOCovered);
-        personsCoveredByStation.setNombreEnfants(nombreEnfants.get());
-        personsCoveredByStation.setNombreAdults(nombreAdultes.get());
-        logger.info("Couverture station  " + personsCoveredByStation);
-
         return personsCoveredByStation;
     }
 
@@ -121,11 +124,17 @@ public class CommonServiceImpl implements CommonService {
         List<String> phones = new ArrayList<>();
         logger.info("Numero de téléphone des personne couverte par la station id :  " + stationId);
         Optional<Firestation> firestation = firestationRepository.findById(stationId);
-        if (firestation.isEmpty())
+        List<String> phonesStation;
+        if (firestation.isEmpty() && firestationRepository.findByStation(stationId).isEmpty())
             throw new FirestationNotFoundException("Station d'id : " + stationId + " introuvable");
-        List<String> phonesStation = personRepository.findByAddressAndSelectPhone(firestation.get().getAddress());
-        phones.addAll(phonesStation);
+        else{
+            if(firestation.isPresent())
+                phonesStation = personRepository.findByAddressAndSelectPhone(firestation.get().getAddress());
+            else
+                phonesStation = personRepository.findByAddressAndSelectPhone(firestationRepository.findByStation(stationId).get().get(0).getAddress());
 
+        }
+        phones.addAll(phonesStation);
         logger.info("Numéro  de téléphone des personne couverte par la station id :  " + stationId + " :: " + phones);
         return phones;
     }
