@@ -154,13 +154,13 @@ public class FirestationServiceTest {
         });
     }
 
-    @Test
+   /* @Test
     public void given_a_non_existing_firestation_udpate_should_raise_exception() throws Exception{
         when(firestationRepository.findById(3)).thenReturn(notFoundFirestation);
         Assertions.assertThrows(FirestationNotFoundException.class, ()->{
             firestationService.update(nonExistingFirestation);
         });
-    }
+    }*/
 
     @Test
     public void find_should_return_all_firestation() throws Exception{
@@ -171,7 +171,7 @@ public class FirestationServiceTest {
     }
 
     @Test
-    public void given_an_id_delete_should_remove_the_firestation() throws Exception{
+    public void given_an_id_delete_should_remove_the_firestation() {
         when(firestationRepository.findById(1)).thenReturn(Optional.of(firestation));
         //when(firestationRepository.delete(firestation)).thenReturn(anyList());
         assertThat(firestations).hasSize(3);
@@ -197,10 +197,27 @@ public class FirestationServiceTest {
     }
 
     @Test
-    public void given_a_non_existing_firestation_id_find_should_raise_Exception() throws Exception{
+    public void given_a_non_existing_firestation_id_findByStation_should_raise_Exception() throws Exception{
         Assertions.assertThrows(FirestationNotFoundException.class, () -> {
             firestationService.findByStation(5);
         });
+    }
+
+    @Test
+    public void given_a_non_existing_firestation_id_findById_should_raise_Exception() {
+        Assertions.assertThrows(FirestationNotFoundException.class, () -> {
+            firestationService.findById(5);
+        });
+    }
+
+    @Test
+    public void given_an_existing_valid_firestation_id_findByStation_should_return_firestation(){
+        List<Firestation> lesStations = new ArrayList<>();
+        lesStations.add(firestation);
+        foundFirestation = Optional.of(lesStations);
+        when(firestationRepository.findByStation(1)).thenReturn(foundFirestation);
+        List<Firestation> firestationFound = firestationService.findByStation(1);
+        assertThat(firestationFound.contains(firestation));
     }
 
     @Test

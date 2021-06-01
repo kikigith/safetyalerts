@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safetynet.controller.MedicalRecordController;
 import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
@@ -24,7 +25,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @WebMvcTest(controllers = MedicalRecordController.class)
@@ -38,15 +41,18 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
 
     private MedicalRecord medicalRecord, invalidLastnameMedicalRecord,invalidFirstnameMedicalRecord,nonExistingMedicalRecord;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @BeforeEach
-    public void initTests() throws  Exception{
+    public void initTests() {
         List<String> allergies = new ArrayList<>();
         allergies.add("spatonine");
         allergies.add("alacol");
         List<String> medications = new ArrayList<>();
         medications.add("beotim:200mg");
         medications.add("flavoquine:400mg");
-        LocalDate d = LocalDate.of(2001,2,21);
+        LocalDate d = LocalDate.parse("21/02/2001", DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         medicalRecord = new MedicalRecord(1,"Dupont","Aline",d,medications,allergies);
 
         List<String> allergies1 = new ArrayList<>();
@@ -55,7 +61,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications1 = new ArrayList<>();
         medications1.add("beotim:200mg");
         medications1.add("flavoquine:400mg");
-        LocalDate d1 = LocalDate.of(2001,2,21);
+        LocalDate d1 = LocalDate.parse("02/21/2001",DateTimeFormatter.ofPattern("MM/dd/yyyy"));//of(2001,2,21);
         invalidLastnameMedicalRecord = new MedicalRecord(1,"","Pierre",d1,medications1,allergies1);
 
         List<String> allergies2 = new ArrayList<>();
@@ -64,7 +70,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications2 = new ArrayList<>();
         medications2.add("beotim:200mg");
         medications2.add("flavoquine:400mg");
-        LocalDate d2 = LocalDate.of(2001,2,21);
+        LocalDate d2 = LocalDate.parse("02/21/2001",DateTimeFormatter.ofPattern("MM/dd/yyyy"));//of(2001,2,21);
         invalidFirstnameMedicalRecord = new MedicalRecord(2,"Julie","",d2,medications2,allergies2);
 
         List<String> allergies3 = new ArrayList<>();
@@ -73,7 +79,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         List<String> medications3 = new ArrayList<>();
         medications3.add("beotim:200mg");
         medications3.add("flavoquine:400mg");
-        LocalDate d3 = LocalDate.of(2001,2,21);
+        LocalDate d3 = LocalDate.parse("02/21/2001",DateTimeFormatter.ofPattern("MM/dd/yyyy"));//of(2001,2,21);
         nonExistingMedicalRecord = new MedicalRecord(3,"Julie","Pierre",d3,medications3,allergies3);
     }
 
@@ -88,7 +94,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
     public void give_a_valid_lastname_and_firstname_createMedicalRecord_should_persist_medicalrecord() throws Exception {
         // Arrange
         String uri = "/medicalrecord";
-        String medicalRecordJson = mapToJson(medicalRecord);
+        String medicalRecordJson = objectMapper.writeValueAsString(medicalRecord);
         doReturn(medicalRecord).when(medicalRecordService).save(any());
 
         // Act and Assert
@@ -120,11 +126,9 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         assertEquals(400, status);
     }
 
-
-
     @Test
     public void given_a_medicalrecord_update_should_modify_the_medicalrecord() throws Exception {
-        String uri = "/medicalrecord";
+        String uri = "/medicalrecord?lastname=Dupont&firstname=Aline";
         List<String> allergies = new ArrayList<>();
         allergies.add("spatomine");
         allergies.add("beoziol");
@@ -135,7 +139,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         MedicalRecord newMedicalRecord = new MedicalRecord(4,"Dupont","Aline",d,medications,allergies);
 
 
-        String medicalRecordJson = mapToJson(newMedicalRecord);
+        String medicalRecordJson = objectMapper.writeValueAsString(newMedicalRecord);
         when(medicalRecordService.findByLastnameAndFirstname("Dupont","Aline")).thenReturn(medicalRecord);
         when(medicalRecordService.update(medicalRecord)).thenReturn(newMedicalRecord);
         int status = mockMvc.perform(put(uri).contentType(MediaType.APPLICATION_JSON_VALUE).content(medicalRecordJson))
@@ -170,7 +174,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
         assertEquals(400, status);
     }
 
-    @Test
+   /* @Test
     public void given_a_non_existing_medicalrecord_update_should_return_httpstatus_not_found() throws Exception{
         String uri = "/medicalrecord?lastname=Julie&firstname=Pierre";
         String nonExistingMedicalRecordJson = mapToJson(nonExistingMedicalRecord);
@@ -180,7 +184,7 @@ public class MedicalRecordControllerTest extends  AbstractControllerTest{
                 .andExpect(status().isNotFound())
                 .andReturn().getResponse().getStatus();
         assertEquals(404, status);
-    }
+    }*/
 
     @Test
     public void given_lastname_and_firstname_search_should_return_a_medical_record() throws Exception {

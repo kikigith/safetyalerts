@@ -1,4 +1,6 @@
 package com.safetynet.service;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import com.safetynet.exception.PersonInvalidException;
 import com.safetynet.exception.PersonNotFoundException;
@@ -30,11 +32,11 @@ public class PersonServiceTest {
     @InjectMocks
     private PersonServiceImpl personService;
 
-    private Person person;
+    private Person person, person1, person2;
     private Person invalidFirstnamePerson;
     private Person invalidLastnamePerson;
     private Person invalidEmailPerson;
-    private List<Person> persons;
+    private List<Person> persons, personsAtRue54;
 
     @BeforeEach
     void initTest() {
@@ -48,7 +50,7 @@ public class PersonServiceTest {
         person.setZip("0000");
         person.setEmail("fmike@gmail.com");
 
-        Person person1 = new Person();
+        person1 = new Person();
         person1.setFirstName("Bill");
         person1.setLastName("Bauer");
         person1.setAddress("Rue 34, Porto");
@@ -57,11 +59,11 @@ public class PersonServiceTest {
         person1.setZip("0000");
         person1.setEmail("bbauer@gmail.com");
 
-        Person person2 = new Person();
+        person2 = new Person();
         person2.setFirstName("mike");
         person2.setLastName("fiver");
         person2.setAddress("Rue 54 parakou");
-        person2.setPhone("928 8484 88");
+        person2.setPhone("039 2484 76");
         person2.setCity("Parakou");
         person2.setZip("0000");
         person2.setEmail("fmike@gmail.com");
@@ -70,6 +72,10 @@ public class PersonServiceTest {
         persons.add(person);
         persons.add(person1);
         persons.add(person2);
+
+        personsAtRue54 = new ArrayList<>();
+        personsAtRue54.add(person);
+        personsAtRue54.add(person2);
 
         invalidFirstnamePerson = new Person();
         invalidFirstnamePerson.setFirstName("");
@@ -251,5 +257,33 @@ public class PersonServiceTest {
     public void given_invalid_name_should_raise_PersonNotFoundException() {
         when(personRepository.findByLastNameAndFirstName("Mike", "Cool")).thenReturn(null);
         Assertions.assertThrows(PersonNotFoundException.class, () -> personService.findByLastNameAndFirstName("Mike", "Cool"));
+    }
+
+    @Test
+    public void given_an_address_should_return_persons_at_the_address() {
+        when(personRepository.findByAddress("Rue 54 parakou")).thenReturn(personsAtRue54);
+        List<Person> personsAtParakou = personService.getPersonsAtAddress("Rue 54 parakou");
+        assertThat(personsAtParakou).hasSize(2);
+        assertThat(personsAtParakou).contains(person);
+        assertThat(personsAtParakou).contains(person2);
+    }
+
+    @Test
+    public void given_an_address_should_return_phones_of_persons_at_the_address(){
+        List<String> phoneAtAddress = new ArrayList<>();
+        phoneAtAddress.add("928 8484 88");
+        phoneAtAddress.add("039 2484 76");
+        when(personRepository.findByAddressAndSelectPhone("Rue 54 parakou")).thenReturn(phoneAtAddress);
+        List<String> personsPhones = personService.getPhonesPersonsAtAddress("Rue 54 parakou");
+        assertThat(personsPhones).hasSize(2);
+        assertThat(personsPhones).contains(person.getPhone());
+        assertThat(personsPhones).contains(person2.getPhone());
+    }
+
+    @Test
+    public void given_a_lastname_and_firstname_should_return_persons() {
+        when(personRepository.findAllByLastNameAndFirstName(anyString(),anyString())).thenReturn(persons);
+        List<Person> allPersons = personService.findAllByLastnameAndFirstname("mike","fiver");
+        assertThat(allPersons).contains(person);
     }
 }

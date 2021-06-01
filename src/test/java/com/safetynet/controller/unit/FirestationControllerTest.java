@@ -173,9 +173,9 @@ public class FirestationControllerTest extends AbstractControllerTest{
     public void given_a_non_existing_firestation_update_should_return_httpstatus_not_found() throws Exception{
         String uri = "/station?stationId=4";
         String firestationJson = mapToJson(nonExistingFirestation);
-        when(firestationService.findByStation(4)).thenReturn(null);
+        when(firestationService.findById(4)).thenReturn(null);
         int status = mockMvc
-                .perform(put("/firestation").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
+                .perform(put("/station").contentType(MediaType.APPLICATION_JSON_VALUE).content(firestationJson))
                 .andExpect(status().isNotFound())
                 .andReturn().getResponse().getStatus();
         assertEquals(404, status);

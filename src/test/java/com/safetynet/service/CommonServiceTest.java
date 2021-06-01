@@ -4,10 +4,7 @@ import com.safetynet.exception.FirestationNotFoundException;
 import com.safetynet.model.Firestation;
 import com.safetynet.model.MedicalRecord;
 import com.safetynet.model.Person;
-import com.safetynet.model.dto.ChildrenCoveredDTO;
-import com.safetynet.model.dto.PersonInfoDTO;
-import com.safetynet.model.dto.PersonsCoveredAtAddress;
-import com.safetynet.model.dto.PersonsCoveredByStation;
+import com.safetynet.model.dto.*;
 import com.safetynet.repository.*;
 import com.safetynet.utils.Utils;
 import org.junit.jupiter.api.Assertions;
@@ -27,8 +24,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.doReturn;
@@ -50,15 +46,16 @@ public class CommonServiceTest {
 
 
     //private MockedStatic<Utils> utilsMock = Mockito.mockStatic(Utils.class);
-    private Person person, person1, person2, person3, person4;
+    private Person person, person1, person2, person3, person4, person5, person6, person7;
     private PersonInfoDTO personInfoDTO, personInfoDTO1, personInfoDTO2, personInfoDTO3, personInfoDTO4;
-    private List<Person> persons,personAtRueDako ;
+    private List<Person> persons,personAtRueDako, personsStation1, personsStation2;
     private List<PersonInfoDTO> personsInfoDTO;
-    private Firestation station;
+    private Firestation station,station1, station2;
     private Optional<Firestation> nonExistingFirestation;
     private List<Firestation> stations;
     private MedicalRecord medicalRecordPerson, medicalRecordPerson1,
-            medicalRecordPerson2, medicalRecordPerson3,medicalRecordPerson4;
+            medicalRecordPerson2, medicalRecordPerson3,medicalRecordPerson4,medicalRecordPerson5,
+            medicalRecordPerson6,medicalRecordPerson7;
     private PersonsCoveredByStation personsCoveredByStation;
 
     @BeforeEach
@@ -108,12 +105,49 @@ public class CommonServiceTest {
         person4.setZip("03-000");
         person4.setAddress("28 rue dako");
 
+        person5 = new Person();
+        person5.setFirstName("Ruffine");
+        person5.setLastName("Laborde");
+        person5.setEmail("rlaborde@yahoo.fr");
+        person5.setCity("Sèmè");
+        person5.setPhone("23890978");
+        person5.setZip("03-000");
+        person5.setAddress("Avenue Bob Marley");
+
+        person6 = new Person();
+        person6.setFirstName("Josué");
+        person6.setLastName("Aifa");
+        person6.setEmail("jaifa@hotmail.fr");
+        person6.setCity("Ekpè");
+        person6.setPhone("238472663");
+        person6.setZip("03-000");
+        person6.setAddress("Avenue Bob Marley");
+
+        person7 = new Person();
+        person7.setFirstName("Josué");
+        person7.setLastName("Aifa");
+        person7.setEmail("jaifa@hotmail.fr");
+        person7.setCity("Ekpè");
+        person7.setPhone("238472663");
+        person7.setZip("03-000");
+        person7.setAddress("45 rue des oliviers");
+
         station = new Firestation();
         station.setStation(1);
         station.setAddress("28 rue dako");
 
+        station1 = new Firestation();
+        station1.setStation(2);
+        station1.setAddress("Avenue Bob Marley");
+
+        station2 = new Firestation();
+        station2.setStation(3);
+        station2.setAddress("45 rue des oliviers");
+
         stations = new ArrayList<>();
         stations.add(station);
+        stations.add(station1);
+        stations.add(station2);
 
         medicalRecordPerson = new MedicalRecord();
         List<String> allergies = new ArrayList<>();
@@ -185,11 +219,62 @@ public class CommonServiceTest {
         medicalRecordPerson4.setAllergies(allergies4);
         medicalRecordPerson4.setMedications(medications4);
 
+        medicalRecordPerson5 = new MedicalRecord();
+        List<String> allergies5 = new ArrayList<>();
+        allergies5.add("azétine");
+        allergies5.add("coarol");
+        List<String> medications5 = new ArrayList<>();
+        medications5.add("rubezol:200mg");
+        medications5.add("panedol:400mg");
+        medicalRecordPerson5.setFirstName("Ruffine");
+        medicalRecordPerson5.setLastName("Laborde");
+        LocalDate d5 = LocalDate.of(2013,5,22);
+        medicalRecordPerson5.setBirthdate(d5);
+        medicalRecordPerson5.setAllergies(allergies5);
+        medicalRecordPerson5.setMedications(medications5);
+
+        medicalRecordPerson6 = new MedicalRecord();
+        List<String> allergies6 = new ArrayList<>();
+        allergies6.add("azétine");
+        allergies6.add("coarol");
+        List<String> medications6 = new ArrayList<>();
+        medications6.add("rubezol:200mg");
+        medications6.add("panedol:400mg");
+        medicalRecordPerson6.setFirstName("Josué");
+        medicalRecordPerson6.setLastName("Aifa");
+        LocalDate d6 = LocalDate.of(2013,5,22);
+        medicalRecordPerson6.setBirthdate(d6);
+        medicalRecordPerson6.setAllergies(allergies6);
+        medicalRecordPerson6.setMedications(medications6);
+
+        medicalRecordPerson7 = new MedicalRecord();
+        List<String> allergies7 = new ArrayList<>();
+        allergies7.add("azétine");
+        allergies7.add("coarol");
+        List<String> medications7 = new ArrayList<>();
+        medications7.add("rubezol:200mg");
+        medications7.add("panedol:400mg");
+        medicalRecordPerson7.setFirstName("Josué");
+        medicalRecordPerson7.setLastName("Aifa");
+        LocalDate d7 = LocalDate.of(2013,5,22);
+        medicalRecordPerson7.setBirthdate(d7);
+        medicalRecordPerson7.setAllergies(allergies7);
+        medicalRecordPerson7.setMedications(medications7);
+
         persons = new ArrayList<>();
         persons.add(person1);
         persons.add(person2);
         persons.add(person3);
         persons.add(person4);
+
+        personsStation1 = new ArrayList<>();
+        personsStation1.add(person5);
+        personsStation1.add(person6);
+
+        personsStation2 = new ArrayList<>();
+        personsStation2.add(person7);
+
+
 
         personInfoDTO = new PersonInfoDTO();
         personInfoDTO.setFirstname(person.getFirstName());
@@ -256,6 +341,7 @@ public class CommonServiceTest {
     @Test
     public void given_a_firestation_id_should_return_persons_covered(){
         when(firestationRepository.findById(1)).thenReturn(Optional.of(station));
+        when(firestationRepository.findByStation(1)).thenReturn(Optional.of(stations));
         //when(firestationRepository.findByAddress("28 rue dako")).thenReturn(Optional.of(stations));
         when(personRepository.findByAddress("28 rue dako")).thenReturn(personAtRueDako);
         when(medicalRecordRepository.findByLastnameAndFirstname(anyString(),anyString())).thenReturn(medicalRecordPerson,
@@ -298,11 +384,13 @@ public class CommonServiceTest {
         assertTrue(childrenCovered.getEnfants().get(1).getFirstname().equalsIgnoreCase("René"));
     }
 
+    @Test
     public void given_a_non_existing_station_address_should_raise_exception(){
-        when(firestationRepository.findByAddress("28 rue dako")).thenReturn(null);
+        when(firestationRepository.findByAddress("28 rue dako")).thenReturn(Optional.empty());
         Assertions.assertThrows(FirestationNotFoundException.class, () -> commonService.produceChildrenAtAddress("28 rue dako"));
     }
 
+    @Test
     public void given_a_station_id_should_return_phone_numbers(){
         List<String> phones = new ArrayList<>();
         phones.add(person.getPhone());
@@ -323,8 +411,36 @@ public class CommonServiceTest {
         Assertions.assertThrows(FirestationNotFoundException.class, () -> commonService.getResidentPhoneNumber(1));
     }
 
+    @Test
     public void given_a_city_should_return_community_emails(){
-        fail();
+        when(personRepository.findAll()).thenReturn(persons);
+        List<String> portoCommunity = commonService.getCommunityEmails("Porto-Novo");
+        assertThat(portoCommunity).contains("fidohou@yahoo.fr","rlokossou@yahoo.fr");
+    }
+
+    @Test
+    public void given_a_lastname_and_firstname_should_return_person_medical_details(){
+        when(personRepository.findAllByLastNameAndFirstName(anyString(),anyString())).thenReturn(persons);
+        when(medicalRecordRepository.findByLastnameAndFirstname(anyString(),anyString())).thenReturn(medicalRecordPerson,
+                medicalRecordPerson1, medicalRecordPerson2, medicalRecordPerson3, medicalRecordPerson4);
+        List<PersonMedicalDetailsDTO> personMedicalDetailsDTOS = commonService.getPersonMedicalDetails("Dossou","Marc");
+        assertThat(personMedicalDetailsDTOS).hasSize(4);
+        assertThat(personMedicalDetailsDTOS.get(0).getFirstname().equalsIgnoreCase("Marc"));
+        assertThat(personMedicalDetailsDTOS.get(0).getLastname().equalsIgnoreCase("Dossou"));
+
+    }
+
+    @Test
+    public void given_a_list_of_stations_should_return_persons_covered(){
+        List<String> lesStations = new ArrayList<>();
+        lesStations.add("2");
+        lesStations.add("3");
+        Optional<List<Firestation>> firestations = Optional.of(stations);
+        when(firestationRepository.findByStation(anyInt())).thenReturn(firestations);
+        when(personRepository.findByAddress(anyString())).thenReturn(personsStation1, personsStation2);
+        when(medicalRecordRepository.findByLastnameAndFirstname(anyString(),anyString())).thenReturn(medicalRecordPerson5,medicalRecordPerson6,medicalRecordPerson7);
+        List<PersonsCoveredAtAddress>  personsCoveredAtAddresses = commonService.getAddressesCoverage(lesStations);
+        assertThat(personsCoveredAtAddresses).hasSize(6);
     }
 
     @Test
